@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- 나이 입력 -->
+    <EditText
+        android:id="@+id/et_age"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="나이 입력"
+        android:minHeight="48dp"
+        android:padding="12dp" />
+
+    <!-- 성별 선택 -->
+    <RadioGroup
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/rb_male"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="남성"
+            android:minHeight="48dp"
+            android:padding="12dp" />
+        <RadioButton
+            android:id="@+id/rb_female"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="여성"
+            android:minHeight="48dp"
+            android:padding="12dp" />
+    </RadioGroup>
+
+    <!-- 임신 여부 스위치 -->
+    <Switch
+        android:id="@+id/switch_pregnant"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="임신 여부"
+        android:minHeight="48dp"
+        android:padding="12dp" />
+
+    <!-- 알레르기 여부 스위치 -->
+    <Switch
+        android:id="@+id/switch_allergy"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="알레르기 여부"
+        android:minHeight="48dp"
+        android:padding="12dp" />
+
+    <!-- 홈으로 돌아가는 버튼 -->
+    <Button
+        android:id="@+id/btn_home"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="홈으로"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

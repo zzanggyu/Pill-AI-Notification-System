@@ -1,0 +1,65 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- 툴바 추가 -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:title="Check Mixability"
+        android:titleTextColor="@android:color/white" />
+
+    <!-- 약물 1 입력 -->
+    <EditText
+        android:id="@+id/et_drug1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="약물 1"
+        android:padding="12dp"
+        android:minHeight="48dp" />
+
+    <!-- 약물 2 입력 -->
+    <EditText
+        android:id="@+id/et_drug2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="약물 2"
+        android:padding="12dp"
+        android:minHeight="48dp" />
+
+    <!-- 혼합 가능성 확인 버튼 -->
+    <Button
+        android:id="@+id/btn_check_mixability"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="혼합 가능성 확인"
+        android:layout_gravity="center"
+        android:padding="12dp"
+        android:layout_marginTop="16dp" />
+
+    <!-- 혼합 결과 출력 -->
+    <TextView
+        android:id="@+id/tv_mixability_result"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="혼합 결과"
+        android:textSize="18sp"
+        android:padding="12dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center" />
+
+    <!-- 홈으로 가는 버튼 -->
+    <Button
+        android:id="@+id/btn_home"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Go to Home"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp" />
+
+</LinearLayout>

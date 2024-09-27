@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- 약물 이미지를 표시할 ImageView -->
+    <ImageView
+        android:id="@+id/iv_pill_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/sample_pill_image" />
+
+    <!-- 이미지 인식 버튼 -->
+    <Button
+        android:id="@+id/btn_capture_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="이미지 인식" />
+
+</LinearLayout>
