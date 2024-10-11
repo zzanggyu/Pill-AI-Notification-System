@@ -14,6 +14,13 @@
 }
 ```
 
+| 필드 | 타입 | 설명 |
+|------|------|------|
+| success | boolean | 요청 성공 여부 |
+| message | string | 응답에 대한 설명 메시지 |
+| data | object/array | 성공 시 반환되는 데이터 (엔드포인트에 따라 다름) |
+| error | string | 실패 시 오류에 대한 상세 설명 |
+
 ## 엔드포인트
 
 ### 1. 알약 분석
@@ -26,6 +33,10 @@
     "image": "base64로 인코딩된 이미지 데이터"
   }
   ```
+  | 필드 | 타입 | 설명 |
+  |------|------|------|
+  | image | string | base64로 인코딩된 알약 이미지 데이터 |
+
 - **성공 응답 (200 OK):**
   ```json
   {
@@ -52,6 +63,23 @@
     ]
   }
   ```
+  | 필드 | 타입 | 설명 |
+  |------|------|------|
+  | item_seq | string | 품목일련번호 |
+  | item_name | string | 제품명 |
+  | company_name | string | 업체명 |
+  | efficacy | string | 효능  |
+  | usage | string | 용법 용량 |
+  | precautions_warning | string | 주의사항 경고 |
+  | precautions | string | 일반 주의사항 |
+  | interactions | string | 상호작용 |
+  | side_effects | string | 부작용 |
+  | storage | string | 보관 방법 |
+  | image_url | string | 제품 이미지 URL |
+  | print_front | string | 식별문자코드(앞) |
+  | print_back | string | 식별문자코드(뒤) |
+  | color | string | 알약 색상 |
+  | shape | string | 알약 모양 |
 
 ### 2. 법적 고지 저장
 - **URL:** `/legal-notice`
@@ -65,6 +93,12 @@
     "accepted": true
   }
   ```
+  | 필드 | 타입 | 설명 |
+  |------|------|------|
+  | userId | string | 사용자 고유 식별자 |
+  | date | string | 법적 고지 수락 일시 (ISO 8601 형식) |
+  | accepted | boolean | 법적 고지 수락 여부 |
+
 - **성공 응답 (200 OK):**
   ```json
   {
@@ -119,6 +153,15 @@
     ]
   }
   ```
+  | 필드 | 타입 | 설명 |
+  |------|------|------|
+  | itemSeq | string | 품목일련번호 |
+  | itemName | string | 제품명 |
+  | efcyQesitm | string | 효능 효과 |
+  | atpnQesitm | string | 주의사항 |
+  | seQesitm | string | 부작용 |
+  | etcotc | string | 전문/일반 구분 |
+  | itemImage | string | 제품 이미지 URL |
 
 ### 5. 알약 정보 검색 (이름 기반)
 - **URL:** `/pills/searchByName`
@@ -144,6 +187,15 @@
     ]
   }
   ```
+  | 필드 | 타입 | 설명 |
+  |------|------|------|
+  | itemSeq | string | 품목일련번호 |
+  | itemName | string | 제품명 |
+  | efcyQesitm | string | 효능 효과 |
+  | atpnQesitm | string | 주의사항 |
+  | seQesitm | string | 부작용 |
+  | etcotc | string | 전문/일반 구분 |
+  | itemImage | string | 제품 이미지 URL |
 
 ### 6. 알약 추가
 - **URL:** `/pills/add`
@@ -162,6 +214,17 @@
     "itemImage": "string"
   }
   ```
+  | 필드 | 타입 | 설명 |
+  |------|------|------|
+  | user_id | string | 사용자 고유 식별자 |
+  | itemSeq | string | 품목일련번호 |
+  | itemName | string | 제품명 |
+  | efcyQesitm | string | 효능 효과 |
+  | atpnQesitm | string | 주의사항 |
+  | seQesitm | string | 부작용 |
+  | etcotc | string | 전문/일반 구분 |
+  | itemImage | string | 제품 이미지 URL |
+
 - **성공 응답 (201 Created):**
   ```json
   {
@@ -181,6 +244,11 @@
     "user_id": "string"
   }
   ```
+  | 필드 | 타입 | 설명 |
+  |------|------|------|
+  | itemSeq | string | 삭제할 알약의 품목일련번호 |
+  | user_id | string | 사용자 고유 식별자 |
+
 - **성공 응답 (200 OK):**
   ```json
   {
@@ -197,13 +265,22 @@
   ```json
   {
     "userId": "string",
-    "age": int,
+    "age": 30,
     "gender": "string",
-    "pregnant": boolean,
-    "nursing": boolean,
+    "pregnant": false,
+    "nursing": false,
     "allergy": "string"
   }
   ```
+  | 필드 | 타입 | 설명 |
+  |------|------|------|
+  | userId | string | 사용자 고유 식별자 |
+  | age | integer | 사용자 나이 |
+  | gender | string | 사용자 성별 |
+  | pregnant | boolean | 임신 여부 |
+  | nursing | boolean | 수유 여부 |
+  | allergy | string | 알레르기 정보 |
+
 - **성공 응답 (200 OK):**
   ```json
   {
@@ -222,6 +299,10 @@
     "userId": "string"
   }
   ```
+  | 필드 | 타입 | 설명 |
+  |------|------|------|
+  | userId | string | 사용자 고유 식별자 |
+
 - **성공 응답 (200 OK):**
   ```json
   {
@@ -250,6 +331,11 @@
     ]
   }
   ```
+  | 필드 | 타입 | 설명 |
+  |------|------|------|
+  | noneItemName | string | 상호작용 약물명 |
+  | noneIngrName | string | 상호작용 약물 성분명 |
+  | noneItemImage | string | 상호작용 약물 이미지 URL |
 
 ### 11. 개인 정보 조회
 - **URL:** `/personal-info`
@@ -263,35 +349,17 @@
     "success": true,
     "message": "Personal info retrieved",
     "data": {
-      "age": int,
+      "age": 30,
       "gender": "string",
-      "pregnant": boolean,
-      "nursing": boolean,
+      "pregnant": false,
+      "nursing": false,
       "allergy": "string"
     }
   }
   ```
-- **실패 응답 (404 Not Found):**
-  ```json
-  {
-    "success": false,
-    "message": "Personal info not found",
-    "error": "User not found"
-  }
-  ```
-
-## 오류 응답
-모든 엔드포인트는 오류 발생 시 다음과 같은 형식의 응답을 반환합니다:
-```json
-{
-  "success": false,
-  "message": "오류 메시지",
-  "error": "상세 오류 설명"
-}
-```
-
-## 주의사항
-1. 모든 요청에는 적절한 인증 정보가 포함되어야 합니다 (구현 예정).
-2. 대용량 데이터 전송 시 적절한 페이지네이션을 사용해야 합니다.
-3. 이미지 데이터는 base64로 인코딩되어 전송됩니다.
-4. 모든 날짜/시간 데이터는 ISO 8601 형식을 따릅니다.
+  | 필드 | 타입 | 설명 |
+  |------|------|------|
+  | age | integer | 사용자 나이 |
+  | gender | string | 사용자 성별 |
+  | pregnant | boolean | 임신 여부 |
+  |
