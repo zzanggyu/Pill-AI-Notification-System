@@ -2,6 +2,7 @@
 
 ## 기본 URL
 모든 엔드포인트는 다음 기본 URL에 접두됩니다: `http://[your-domain]/api/v1`
+로컬 호스트 예) 'http://10.0.2.2:5000/api/v1/analyze_pill'
 
 ## 응답 형식
 모든 API 응답은 다음 형식을 따릅니다:
