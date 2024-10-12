@@ -365,3 +365,54 @@
   | gender | string | 사용자 성별 |
   | pregnant | boolean | 임신 여부 |
   |
+
+### 12. 사용자별 약물 조회
+- **URL:** `/pills/user`
+- **Method:** GET
+- **설명:** 특정 사용자의 약물 정보를 조회합니다.
+- **쿼리 파라미터:**
+  - `userId`: 사용자 ID (필수)
+- **성공 응답 (200 OK):**
+  ```json
+  {
+    "success": true,
+    "message": "User medications retrieved successfully",
+    "data": [
+      {
+      "itemSeq": "string",
+      "itemName": "string",
+      "efcyQesitm": "string",
+      "atpnQesitm": "string",
+      "seQesitm": "string",
+      "etcotc": "string",
+      "itemImage": "string"
+      }
+    ]
+  }
+  ```
+  | 필드 | 타입 | 설명 |
+  |------|------|------|
+  | itemSeq | string | 품목일련번호 |
+  | itemName | string | 제품명 |
+  | efcyQesitm | string | 효능 효과 |
+  | atpnQesitm | string | 주의사항 |
+  | seQesitm | string | 부작용 |
+  | etcotc | string | 전문/일반 구분 |
+  | itemImage | string | 제품 이미지 URL |
+- **실패 응답 (404 Bad Request):**
+  ```json
+  {
+    "success": false,
+    "message": "user_id parameter is required",
+    "error": "Incomplete data"
+  }
+  ```
+- **실패 응답 (404 Not Found):**
+  ```json
+  {
+    "success": false,
+    "message": "No medications found for this user.",
+    "error": "not found"
+  }
+  ```
+
