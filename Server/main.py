@@ -385,14 +385,17 @@ def delete_pill():
         return create_response(True, "Pill deleted successfully")
     else:
         return create_response(False, "Failed to delete pill", error="Database error")
+    
+
 # id에 해당하는 약물 정보 불러오기
-@app.route('/api/pills/user', methods=['GET'])
+@api_v1.route('/pills/user', methods=['GET'])
+@error_handler
 def get_user_medications():
     user_id = request.args.get('user_id')
     
     if not user_id:
-        return jsonify({"error": "user_id parameter is required"}), 400
-
+        
+        return create_response(False,"user_id parameter is required", error="Incomplete data")
     try:
         db = get_db_connection()
         with db.cursor() as cursor:
@@ -408,13 +411,13 @@ def get_user_medications():
         db.close()
 
         if medications:
-            return jsonify(medications), 200
+            return create_response(True,"user_id be matched pill, successfully")
         else:
-            return jsonify({"message": "No medications found for this user."}), 404
-
+            return create_response(False,"No medications found for this user.",error="not found")
+        
     except Exception as e:
-        print(f"Error: {str(e)}")
-        return jsonify({"error": str(e)}), 500        
+        # print(f"Error: {str(e)}")      
+        return create_response(False,"Failed to save personal information", error=str(e)) 
 
 # 개인 정보 저장 엔드포인트
 @api_v1.route('/personal-info/save', methods=['POST'])
