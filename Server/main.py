@@ -10,6 +10,7 @@ import logging
 from functools import wraps
 from flask import Blueprint
 
+MODEL_SERVER_URL = "http://localhost:5000/process_image" ## 모델 서버 url
 
 # v1 API (버전 1) Blueprint 생성
 api_v1 = Blueprint('api_v1', __name__, url_prefix='/api/v1')
@@ -27,6 +28,8 @@ CORS(app)
 # DEBUG 레벨로 로깅을 설정하여 개발 중 상세한 로그를 확인할 수 있습니다.
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+
 
 ## 표준화된 API 응답을 만들기 위한 함수
 def create_response(success, message, data=None, error=None):
@@ -77,9 +80,9 @@ def error_handler(f):
 # }
 DB_CONFIG = {
     'host': 'localhost', # 호스트 설정
-    'database': 'pill_project', # 데이터베이스 이름
-    'user': 'your_username', # 권한이 부여된 사용자 아이디
-    'password': 'your_password' # 권한이 부여된 사용자 비밀번호
+    'database': 'pill2', # 데이터베이스 이름
+    'user': 'root', # 권한이 부여된 사용자 아이디
+    'password': '0000' # 권한이 부여된 사용자 비밀번호
 }
 
 # 데이터베이스 연결을 생성하는 함수
@@ -509,5 +512,5 @@ app.register_blueprint(api_v1)
 
 if __name__ == '__main__':
     create_tables()
-    print('서버가 http://localhost:5000 에서 실행 중입니다.')
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    print('서버가 http://localhost:5001 에서 실행 중입니다.')
+    app.run(host='0.0.0.0', port=5001, debug=True)
