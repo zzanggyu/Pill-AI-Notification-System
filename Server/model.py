@@ -15,6 +15,7 @@ from sklearn.cluster import KMeans, MiniBatchKMeans  # 클러스터링 알고리
 from sklearn.utils import parallel_backend  # 병렬 처리 지원
 from joblib import parallel_backend  # 병렬 처리 지원
 from sklearn.mixture import GaussianMixture  # 가우시안 혼합 모델
+import torch # gpu 사용하기 위해서 
 
 # 로깅 설정
 logging.basicConfig(level=logging.DEBUG)  # 로깅 레벨을 DEBUG로 설정
