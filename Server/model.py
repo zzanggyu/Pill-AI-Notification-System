@@ -67,6 +67,8 @@ class PillRecognitionModel:
             raise FileNotFoundError(f"YOLO model file not found at {model_path}")
         # YOLO 모델 로드
         model = YOLO(model_path)
+        device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        model.to(device)
         return model
 
     # 이미지 전처리
