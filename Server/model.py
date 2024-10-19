@@ -15,7 +15,8 @@ from sklearn.cluster import KMeans, MiniBatchKMeans  # 클러스터링 알고리
 from sklearn.utils import parallel_backend  # 병렬 처리 지원
 from joblib import parallel_backend  # 병렬 처리 지원
 from sklearn.mixture import GaussianMixture  # 가우시안 혼합 모델
-import torch # gpu 사용하기 위해서 
+import logging
+import torch
 
 # 로깅 설정
 logging.basicConfig(level=logging.DEBUG)  # 로깅 레벨을 DEBUG로 설정
@@ -30,7 +31,8 @@ class PillRecognitionModel:
         # YOLO 모델 로드
         self.yolo_model = self.load_yolo_model()
         # OCR 리더 초기화
-        self.ocr_reader = easyocr.Reader(['en'], model_storage_directory='G:/내 드라이브/EASY/model', recog_network='english_g2')
+        ### easy 모델 디렉토리 경로 입력
+        self.ocr_reader = easyocr.Reader(['en'], model_storage_directory='G:/내 드라이브/캡스톤 디자인 최종본/Easy', recog_network='english_g2') 
         # 색상 그룹 정의
         self.color_groups = {
             '하양': [('하양', (210, 210, 210)), ('하양', (220, 220, 220)), ('하양', (240, 240, 240))],
@@ -63,14 +65,15 @@ class PillRecognitionModel:
     # YOLO 모델 로드
     def load_yolo_model(self):
         # YOLO 모델 파일 경로 설정 (환경 변수 또는 기본 경로 사용)
-        model_path = os.environ.get('YOLO_MODEL_PATH', 'G:/내 드라이브/yolo_checkpoints/pill/weights/best.pt')
+        model_path = os.environ.get('YOLO_MODEL_PATH', 'G:/내 드라이브/캡스톤 디자인 최종본/Yolov8n/weights/best.pt') # YOLO 경로 설정해야함!
         if not os.path.exists(model_path):
             raise FileNotFoundError(f"YOLO model file not found at {model_path}")
         # YOLO 모델 로드
         model = YOLO(model_path)
-        device = 'cuda' if torch.cuda.is_available() else 'cpu'
-        model.to(device)
+        model.to('cuda' if torch.cuda.is_available() else 'cpu')
+
         return model
+
 
     # 이미지 전처리
     def preprocess_image(self, image):
@@ -275,6 +278,6 @@ if __name__ == '__main__':
     try:
         logger.info('서버를 시작합니다...')
         print('서버가 http://localhost:5000 에서 실행 중입니다.')
-        app.run(host='0.0.0.0', port=5000, debug=False)
+        app.run(host='0.0.0.0', port=5000, debug=True)
     except Exception as e:
         logger.error(f"서버 실행 중 오류 발생: {str(e)}", exc_info=True)
