@@ -1,0 +1,65 @@
+import requests
+import base64
+import json
+
+def send_image_to_server(image_path):
+    # 이미지를 Base64로 인코딩
+    with open(image_path, "rb") as image_file:
+        encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+    # JSON 데이터 생성
+    data = json.dumps({"image": encoded_string})
+    # 서버에 요청 보내기
+    
+    url = "http://121.132.196.27:5001/api/v1/analyze_pill"
+    headers = {'Content-Type': 'application/json'}
+    
+    try:
+        response = requests.post(url, data=data, headers=headers, timeout=100)  # 100초 타임아웃
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as e:
+        print(f"Error sending request: {e}")
+        if hasattr(e, 'response'):
+            print(f"Response status code: {e.response.status_code}")
+            print(f"Response content: {e.response.text}")
+        return None
+
+def extract_pill_info(server_response):
+    if not server_response or not server_response.get('success'):
+        return "서버 응답 실패 또는 데이터 없음"
+
+    pills = server_response['data']
+    extracted_info = []
+
+    for pill in pills:
+        info = {
+            "이름": pill.get('item_name'),
+            "제조사": pill.get('company_name'),
+            "효능": pill.get('efficacy'),
+            "용법": pill.get('usage'),
+            "주의사항": pill.get('precautions'),
+            "부작용": pill.get('side_effects'),
+            "색상": pill.get('color'),
+            "모양": pill.get('shape'),
+            "표시(앞)": pill.get('print_front'),
+            "표시(뒤)": pill.get('print_back'),
+            "이미지 URL": pill.get('image_url')
+        }
+        extracted_info.append(info)
+
+    return extracted_info
+
+# 메인 실행 부분
+if __name__ == "__main__":
+    image_path = "G:/내 드라이브/캡스톤 디자인 최종본/pillimgtest/matchedDB/아스노캡슐.jpg"
+    result = send_image_to_server(image_path)
+
+    if result:
+        pill_info = extract_pill_info(result)
+        for idx, pill in enumerate(pill_info, 1):
+            print(f"\n약품 {idx} 정보:")
+            for key, value in pill.items():
+                if value:  # 값이 있는 경우에만 출력
+                    print(f"{key}: {value[:100]}..." if len(str(value)) > 100 else f"{key}: {value}")
+    else:
+        print("서버로부터 응답을 받지 못했습니다.")
