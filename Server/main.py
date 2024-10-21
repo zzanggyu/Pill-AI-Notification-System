@@ -316,7 +316,7 @@ def search():
 
     where_clause = " WHERE " + " OR ".join(query_conditions) if query_conditions else ""
     
-    query = f"SELECT * FROM only_data{where_clause}"
+    query = f"SELECT * FROM normal_drug{where_clause}"
     drug_results = db_query(query, tuple(parameters))
 
     return create_response(True, "Search completed successfully", data=drug_results)
@@ -332,7 +332,7 @@ def search_by_name():
 
     drug_query = """
     SELECT itemSeq, itemName, efcyQesitm, atpnQesitm, seQesitm, etcotc, itemImage 
-    FROM only_data 
+    FROM normal_drug 
     WHERE itemName LIKE %s
     """
     drug_results = db_query(drug_query, ("%" + item_name + "%",))
