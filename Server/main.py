@@ -520,16 +520,33 @@ def reset_personal_info():
 @error_handler
 def get_drug_interactions():
     drug_item_name = request.args.get('drugItemName')
+    user_id = request.args.get('userId')
 
-    if not drug_item_name:
-        return create_response(False, "Missing parameter", error="drugItemName parameter is required")
+    if not drug_item_name or not user_id:
+        return create_response(False, "Missing parameter", error="drugItemName and userId are required")
 
-    query = """
+    # 사용자 복용 중인 약물 가져오기
+    user_pills_query = "SELECT itemSeq, itemName FROM user_pill WHERE user_id = %s"
+    user_pills = db_query(user_pills_query, (user_id,))
+    user_pill_names = [pill['itemName'] for pill in user_pills]  # 사용자가 복용 중인 약물 목록
+
+    # 복용 중인 약물이 없으면 빈 결과 반환
+    if not user_pill_names:
+        return create_response(True, "No drug interactions found", data=[])
+
+    # 복용 중인 약물 목록을 문자열로 변환 (SQL의 IN 절에서 사용할 수 있도록)
+    # '%s' 형식을 사용하여 SQL에 안전하게 값을 전달
+    formatted_user_pill_names = ', '.join(['%s'] * len(user_pill_names))
+
+    # 상호작용 약물 조회 (복용 중인 약물에 대한 상호작용만 조회)
+    interaction_query = f"""
     SELECT noneItemName, noneIngrName, noneItemImage 
     FROM none_drug 
-    WHERE drugItemName = %s
+    WHERE drugItemName = %s AND noneItemName IN ({formatted_user_pill_names})
     """
-    interactions = db_query(query, (drug_item_name,))
+    
+    # 매개변수로 drug_item_name과 user_pill_names의 값을 전달
+    interactions = db_query(interaction_query, [drug_item_name] + user_pill_names)
 
     return create_response(True, "Drug interactions retrieved", data=interactions)
 
