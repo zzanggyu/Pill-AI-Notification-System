@@ -1,0 +1,6 @@
+pip install mysql-connector-python
+pip install Flask
+pip install requests
+pip install flask-cors
+pip install fuzzywuzzy
+pip install python-Levenshtein  # fuzzywuzzy와 함께 설치하는 것이 좋습니다.
