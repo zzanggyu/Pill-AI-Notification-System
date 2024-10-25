@@ -4,3 +4,35 @@ pip install requests
 pip install flask-cors
 pip install fuzzywuzzy
 pip install python-Levenshtein  # fuzzywuzzy와 함께 설치하는 것이 좋습니다.
+
+# PyTorch 설치 (GPU 사용 시)
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+
+# PyTorch 설치 (CPU 전용)
+pip install torch torchvision
+
+# 기타 AI/ML 라이브러리
+pip install ultralytics
+pip install easyocr
+pip install opencv-python
+pip install scikit-learn
+pip install Pillow
+pip install numpy
+
+3. 필요한 모델 파일
+
+YOLO 모델: best.pt
+
+위치: /Yolov8n/weights/best.pt
+
+
+VGG 모델: pill_shape_classifier_3class_best.pth
+
+위치: /vgg/pill_shape_classifier_3class_best.pth
+
+
+EasyOCR 모델
+
+위치: /Easy/ 디렉토리
+
+PUBLIC_IP = "서버IP주소"  # 실제 서버 IP로 변경
