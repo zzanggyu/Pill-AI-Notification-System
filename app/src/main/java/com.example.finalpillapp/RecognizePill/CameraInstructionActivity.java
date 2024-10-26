@@ -1,8 +1,9 @@
 package com.example.finalpillapp.RecognizePill;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.ImageFormat;
+import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -13,6 +14,7 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraMetadata;
 import android.hardware.camera2.TotalCaptureResult;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
@@ -24,8 +26,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.example.pillapp.R;
+import com.example.finalpillapp.API.ApiResponse;
+import com.example.finalpillapp.API.ApiService;
+import com.example.finalpillapp.API.RetrofitClientInstance;
+import com.example.finalpillapp.PillInfo.PillInfo;
+import com.google.gson.Gson;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CameraInstructionActivity extends AppCompatActivity {
 
@@ -41,14 +54,12 @@ public class CameraInstructionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.camera);
 
-        // Initialize UI elements
         ImageButton backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> finish());
 
         cameraPreview = findViewById(R.id.camera_preview);
         cameraPreview.setSurfaceTextureListener(textureListener);
 
-        // Initialize capture button
         captureButton = findViewById(R.id.capture_button);
         captureButton.setOnClickListener(v -> takePicture());
     }
@@ -154,14 +165,19 @@ public class CameraInstructionActivity extends AppCompatActivity {
 
         try {
             CaptureRequest.Builder captureBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
-            captureBuilder.addTarget(new Surface(cameraPreview.getSurfaceTexture()));
+            SurfaceTexture texture = cameraPreview.getSurfaceTexture();
+            Surface surface = new Surface(texture);
+
+            captureBuilder.addTarget(surface);
             captureBuilder.set(CaptureRequest.CONTROL_MODE, CameraMetadata.CONTROL_MODE_AUTO);
 
             captureSession.capture(captureBuilder.build(), new CameraCaptureSession.CaptureCallback() {
                 @Override
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
                     super.onCaptureCompleted(session, request, result);
-                    Toast.makeText(CameraInstructionActivity.this, "사진이 촬영되었습니다.", Toast.LENGTH_SHORT).show();
+
+                    Bitmap bitmap = textureToBitmap(texture);
+                    uploadImageToServer(bitmap);
                 }
             }, null);
 
@@ -170,33 +186,44 @@ public class CameraInstructionActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onPause() {
-        closeCamera();
-        super.onPause();
+    private Bitmap textureToBitmap(SurfaceTexture texture) {
+        return cameraPreview.getBitmap();
     }
 
-    private void closeCamera() {
-        if (captureSession != null) {
-            captureSession.close();
-            captureSession = null;
-        }
-        if (cameraDevice != null) {
-            cameraDevice.close();
-            cameraDevice = null;
-        }
-    }
+    private void uploadImageToServer(Bitmap bitmap) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+        byte[] byteArray = byteArrayOutputStream.toByteArray();
+        String base64Image = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        PillImageRequest request = new PillImageRequest(base64Image);
+        ApiService apiService = RetrofitClientInstance.getRetrofitInstance().create(ApiService.class);
+        Call<ApiResponse<List<PillInfo>>> call = apiService.analyzePill(request);
 
-        if (requestCode == 200) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                openCamera();
-            } else {
-                Toast.makeText(this, "카메라 권한이 필요합니다.", Toast.LENGTH_SHORT).show();
+        call.enqueue(new Callback<ApiResponse<List<PillInfo>>>() {
+            @Override
+            public void onResponse(@NonNull Call<ApiResponse<List<PillInfo>>> call, @NonNull Response<ApiResponse<List<PillInfo>>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse<List<PillInfo>> apiResponse = response.body();
+                    if (apiResponse.isSuccess()) {
+                        List<PillInfo> pillInfoList = apiResponse.getData();
+
+                        // Pass data to CameraSearchResult using Intent
+                        Intent intent = new Intent(CameraInstructionActivity.this, CameraSearchResult.class);
+                        intent.putExtra("pillInfoList", new Gson().toJson(pillInfoList));
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(CameraInstructionActivity.this, apiResponse.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(CameraInstructionActivity.this, "알약 분석 실패: 서버 응답 오류", Toast.LENGTH_SHORT).show();
+                }
             }
-        }
+
+            @Override
+            public void onFailure(@NonNull Call<ApiResponse<List<PillInfo>>> call, @NonNull Throwable t) {
+                Toast.makeText(CameraInstructionActivity.this, "API 호출 실패: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
