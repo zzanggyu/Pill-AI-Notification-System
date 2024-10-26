@@ -42,32 +42,36 @@ import retrofit2.Response;
 
 public class CameraInstructionActivity extends AppCompatActivity {
 
-    private TextureView cameraPreview;
-    private CameraDevice cameraDevice;
-    private CameraCaptureSession captureSession;
-    private CaptureRequest.Builder captureRequestBuilder;
-    private Size previewSize;
-    private ImageButton captureButton;
+    private TextureView cameraPreview; // 카메라 프리뷰를 위한 TextureView
+    private CameraDevice cameraDevice; // 카메라 장치 객체
+    private CameraCaptureSession captureSession; // 카메라 캡처 세션
+    private CaptureRequest.Builder captureRequestBuilder; // 캡처 요청 빌더
+    private Size previewSize; // 프리뷰 화면 크기
+    private ImageButton captureButton; // 사진 촬영 버튼
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.camera);
 
+        // 뒤로가기 버튼 설정
         ImageButton backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> finish());
 
+        // 카메라 프리뷰 설정
         cameraPreview = findViewById(R.id.camera_preview);
         cameraPreview.setSurfaceTextureListener(textureListener);
 
+        // 사진 촬영 버튼 설정
         captureButton = findViewById(R.id.capture_button);
         captureButton.setOnClickListener(v -> takePicture());
     }
 
+    // TextureView의 SurfaceTextureListener 설정
     private final TextureView.SurfaceTextureListener textureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-            openCamera();
+            openCamera(); // 카메라 열기
         }
 
         @Override
@@ -82,19 +86,22 @@ public class CameraInstructionActivity extends AppCompatActivity {
         public void onSurfaceTextureUpdated(SurfaceTexture surface) {}
     };
 
+    // 카메라 열기 메서드
     private void openCamera() {
         CameraManager manager = (CameraManager) getSystemService(CAMERA_SERVICE);
         try {
-            String cameraId = manager.getCameraIdList()[0];
+            String cameraId = manager.getCameraIdList()[0]; // 기본 카메라 ID 가져오기
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
             previewSize = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP)
-                    .getOutputSizes(SurfaceTexture.class)[0];
+                    .getOutputSizes(SurfaceTexture.class)[0]; // 프리뷰 크기 설정
 
+            // 카메라 권한 체크
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 200);
                 return;
             }
 
+            // 카메라 열기
             manager.openCamera(cameraId, stateCallback, null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
@@ -102,25 +109,27 @@ public class CameraInstructionActivity extends AppCompatActivity {
         }
     }
 
+    // 카메라 장치의 상태 콜백 설정
     private final CameraDevice.StateCallback stateCallback = new CameraDevice.StateCallback() {
         @Override
         public void onOpened(@NonNull CameraDevice camera) {
             cameraDevice = camera;
-            createCameraPreview();
+            createCameraPreview(); // 카메라 프리뷰 생성
         }
 
         @Override
         public void onDisconnected(@NonNull CameraDevice camera) {
-            camera.close();
+            camera.close(); // 연결 해제 시 카메라 닫기
         }
 
         @Override
         public void onError(@NonNull CameraDevice camera, int error) {
-            camera.close();
+            camera.close(); // 에러 발생 시 카메라 닫기
             cameraDevice = null;
         }
     };
 
+    // 카메라 프리뷰 생성 메서드
     private void createCameraPreview() {
         try {
             SurfaceTexture texture = cameraPreview.getSurfaceTexture();
@@ -129,14 +138,14 @@ public class CameraInstructionActivity extends AppCompatActivity {
 
             Surface surface = new Surface(texture);
             captureRequestBuilder = cameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-            captureRequestBuilder.addTarget(surface);
+            captureRequestBuilder.addTarget(surface); // 프리뷰 화면 설정
 
             cameraDevice.createCaptureSession(Arrays.asList(surface), new CameraCaptureSession.StateCallback() {
                 @Override
                 public void onConfigured(@NonNull CameraCaptureSession session) {
                     if (cameraDevice == null) return;
                     captureSession = session;
-                    updatePreview();
+                    updatePreview(); // 프리뷰 업데이트
                 }
 
                 @Override
@@ -149,6 +158,7 @@ public class CameraInstructionActivity extends AppCompatActivity {
         }
     }
 
+    // 카메라 프리뷰 업데이트 메서드
     private void updatePreview() {
         if (cameraDevice == null) return;
 
@@ -160,6 +170,7 @@ public class CameraInstructionActivity extends AppCompatActivity {
         }
     }
 
+    // 사진 촬영 메서드
     private void takePicture() {
         if (cameraDevice == null) return;
 
@@ -176,6 +187,7 @@ public class CameraInstructionActivity extends AppCompatActivity {
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
                     super.onCaptureCompleted(session, request, result);
 
+                    // 촬영된 이미지를 비트맵으로 변환하고 서버에 업로드
                     Bitmap bitmap = textureToBitmap(texture);
                     uploadImageToServer(bitmap);
                 }
@@ -186,16 +198,20 @@ public class CameraInstructionActivity extends AppCompatActivity {
         }
     }
 
+    // TextureView에서 비트맵으로 변환
     private Bitmap textureToBitmap(SurfaceTexture texture) {
         return cameraPreview.getBitmap();
     }
 
+    // 서버에 이미지 업로드
     private void uploadImageToServer(Bitmap bitmap) {
+        // 비트맵 이미지를 Base64 문자열로 변환
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
         byte[] byteArray = byteArrayOutputStream.toByteArray();
         String base64Image = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
+        // API 요청 생성 및 호출
         PillImageRequest request = new PillImageRequest(base64Image);
         ApiService apiService = RetrofitClientInstance.getRetrofitInstance().create(ApiService.class);
         Call<ApiResponse<List<PillInfo>>> call = apiService.analyzePill(request);
@@ -208,7 +224,7 @@ public class CameraInstructionActivity extends AppCompatActivity {
                     if (apiResponse.isSuccess()) {
                         List<PillInfo> pillInfoList = apiResponse.getData();
 
-                        // Pass data to CameraSearchResult using Intent
+                        // 분석된 정보 전달을 위한 CameraSearchResult 액티비티로 전환
                         Intent intent = new Intent(CameraInstructionActivity.this, CameraSearchResult.class);
                         intent.putExtra("pillInfoList", new Gson().toJson(pillInfoList));
                         startActivity(intent);

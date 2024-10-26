@@ -15,8 +15,10 @@ import com.example.finalpillapp.API.ApiService;
 import com.example.finalpillapp.API.RetrofitClientInstance;
 import com.example.finalpillapp.Main.MainActivity;
 import com.example.finalpillapp.PillInfo.PillInfo;
+import com.example.finalpillapp.SearchPill.SearchResultsActivity;
 import com.example.pillapp.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -74,7 +76,10 @@ public class NameSearchActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     List<PillInfo> searchResults = response.body().getData();
                     if (searchResults != null && !searchResults.isEmpty()) {
-                        Log.d("NameSearchActivity", "검색 결과 개수: " + searchResults.size());
+                        // SearchResultsActivity로 검색 결과를 전달하고 전환
+                        Intent intent = new Intent(NameSearchActivity.this, SearchResultsActivity.class);
+                        intent.putParcelableArrayListExtra("pillList", new ArrayList<>(searchResults));
+                        startActivity(intent);
                     } else {
                         Toast.makeText(NameSearchActivity.this, "검색 결과가 없습니다.", Toast.LENGTH_SHORT).show();
                     }

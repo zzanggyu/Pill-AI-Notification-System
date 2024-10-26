@@ -1,8 +1,6 @@
-// PillDetailActivity.java
 package com.example.finalpillapp.SearchPill;
 
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ImageButton;
@@ -14,16 +12,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.finalpillapp.API.ApiService;
 import com.example.finalpillapp.API.RetrofitClientInstance;
+import com.example.finalpillapp.PillImformation.ManufacturerActivity;
+import com.example.finalpillapp.PillImformation.PillInfoActivity;
+import com.example.finalpillapp.PillImformation.PreparationActivity;
+import com.example.finalpillapp.PillImformation.SideEffectsActivity;
+import com.example.finalpillapp.PillImformation.UsageActivity;
+import com.example.finalpillapp.PillImformation.WarningActivity;
 import com.example.finalpillapp.PillInfo.PillInfo;
 import com.example.pillapp.R;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
+import com.google.gson.JsonObject;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -31,10 +30,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class PillDetailActivity extends AppCompatActivity {
-
-    private static final String RECENT_SEARCH_PREFS = "RecentSearchPrefs";
-    private static final String RECENT_SEARCH_KEY = "RecentSearch";
-    private static final int MAX_RECENT_ITEMS = 10;
 
     private PillInfo pill;
 
@@ -45,17 +40,23 @@ public class PillDetailActivity extends AppCompatActivity {
 
         Log.d("PillDetailActivity", "Activity 시작됨");
 
+        // Intent로 전달된 PillInfo 객체 복원
         pill = getIntent().getParcelableExtra("selectedPill");
         if (pill == null) {
-            Log.e("PillDetailActivity", "Pill 객체가 null입니다. 인텐트 데이터가 전달되지 않았습니다.");
+            Log.e("PillDetailActivity", "Pill 객체가 null입니다.");
             Toast.makeText(this, "약 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
             finish();
             return;
         } else {
-            Log.d("PillDetailActivity", "Pill 객체가 정상적으로 로드됨: " + pill.getItemName());
+            Log.d("PillDetailActivity", "Pill 객체 로드됨: " + pill.getItemName());
         }
 
-        // UI 요소 찾기
+        // UI 요소 초기화 및 데이터 설정
+        setupUI();
+    }
+
+    // UI 요소 초기화 및 PillInfo 데이터 설정
+    private void setupUI() {
         ImageButton backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> finish());
 
@@ -63,33 +64,48 @@ public class PillDetailActivity extends AppCompatActivity {
         TextView pillNameTextView = findViewById(R.id.pill_name);
         TextView pillEffectTextView = findViewById(R.id.pill_effect);
 
-        ImageButton addMedicationButton = findViewById(R.id.add_to_favorites_button);
-
-        // UI에 데이터 설정
+        // 데이터 설정
         pillNameTextView.setText(pill.getItemName());
         pillEffectTextView.setText("효능: " + pill.getEfcyQesitm());
-        Picasso.get().load(pill.getImageUrl()).into(pillImageView);
+        Picasso.get().load(pill.getItemImage()).into(pillImageView);
 
-        // "복용 중인 약 추가" 버튼 클릭 리스너 설정
-        addMedicationButton.setOnClickListener(v -> {
-            addMedicationToDatabase();
-            saveToRecentSearch(pill);  // 최근 본 알약에 저장
-        });
+        // 각 상세 정보 버튼 설정
+        setupDetailButtons();
     }
 
+    // 각 상세 정보 버튼에 클릭 리스너 설정
+    private void setupDetailButtons() {
+        ImageButton detailsButton = findViewById(R.id.details_button);
+        ImageButton warningButton = findViewById(R.id.warning_button);
+        ImageButton usageButton = findViewById(R.id.usage_button);
+        ImageButton sideEffectsButton = findViewById(R.id.side_effects_button);
+        ImageButton preparationButton = findViewById(R.id.preparation_button);
+        ImageButton manufacturerButton = findViewById(R.id.manufacturer_button);
+
+        // 각 버튼 클릭 시 해당 화면으로 이동
+        detailsButton.setOnClickListener(v -> startActivity(new Intent(this, PillInfoActivity.class)));
+        warningButton.setOnClickListener(v -> startActivity(new Intent(this, WarningActivity.class)));
+        usageButton.setOnClickListener(v -> startActivity(new Intent(this, UsageActivity.class)));
+        sideEffectsButton.setOnClickListener(v -> startActivity(new Intent(this, SideEffectsActivity.class)));
+        preparationButton.setOnClickListener(v -> startActivity(new Intent(this, PreparationActivity.class)));
+        manufacturerButton.setOnClickListener(v -> startActivity(new Intent(this, ManufacturerActivity.class)));
+    }
+
+    // 사용자의 복용 약 목록에 약물 추가
     private void addMedicationToDatabase() {
         String userId = DeviceUtil.getDeviceId(this);
         Log.d("PillDetailActivity", "기기 ID: " + userId);
 
+        // 서버로 전달할 약물 정보 JSON 생성
         JsonObject pillJson = new JsonObject();
         pillJson.addProperty("user_id", userId);
         pillJson.addProperty("itemSeq", pill.getItemSeq());
         pillJson.addProperty("itemName", pill.getItemName());
         pillJson.addProperty("efcyQesitm", pill.getEfcyQesitm());
         pillJson.addProperty("atpnQesitm", pill.getAtpnQesitm());
-        pillJson.addProperty("SideEffects", pill.getSideEffects());
+        pillJson.addProperty("seQesitm", pill.getSeQesitm());
         pillJson.addProperty("etcotc", pill.getEtcotc());
-        pillJson.addProperty("itemImage", pill.getImageUrl());
+        pillJson.addProperty("itemImage", pill.getItemImage());
 
         ApiService apiService = RetrofitClientInstance.getApiService();
         Call<ResponseBody> call = apiService.addPill(pillJson);
@@ -112,42 +128,5 @@ public class PillDetailActivity extends AppCompatActivity {
                 Log.e("PillDetailActivity", "서버 오류: " + t.getMessage(), t);
             }
         });
-    }
-
-    // 최근 본 알약 SharedPreferences에 저장
-    private void saveToRecentSearch(PillInfo pillInfo) {
-        SharedPreferences sharedPreferences = getSharedPreferences(RECENT_SEARCH_PREFS, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        Gson gson = new Gson();
-
-        // 기존 목록 불러오기
-        String recentPillsJson = sharedPreferences.getString(RECENT_SEARCH_KEY, null);
-        List<PillInfo> recentPills;
-
-        if (recentPillsJson != null) {
-            Type type = new TypeToken<List<PillInfo>>() {}.getType();
-            recentPills = gson.fromJson(recentPillsJson, type);
-        } else {
-            recentPills = new ArrayList<>();
-        }
-
-        // 중복 제거: 같은 알약이 있으면 기존 항목 삭제
-        for (int i = 0; i < recentPills.size(); i++) {
-            if (recentPills.get(i).getItemSeq().equals(pillInfo.getItemSeq())) {
-                recentPills.remove(i);
-                break;
-            }
-        }
-
-        // 새로운 알약 추가 (최대 10개 유지)
-        recentPills.add(0, pillInfo);  // 최신 알약을 맨 앞으로 추가
-        if (recentPills.size() > MAX_RECENT_ITEMS) {
-            recentPills.remove(recentPills.size() - 1);  // 가장 오래된 항목 삭제
-        }
-
-        // 변경된 목록 저장
-        String updatedPillsJson = gson.toJson(recentPills);
-        editor.putString(RECENT_SEARCH_KEY, updatedPillsJson);
-        editor.apply();
     }
 }
