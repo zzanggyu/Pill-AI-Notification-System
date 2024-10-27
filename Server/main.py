@@ -1,4 +1,4 @@
-## identify_and_get_pill_info(pill_result) 연구하기 ###
+## identify_and_get_pill_info(pill_result) 연구하기 ### 10월 27일
 # 필요한 라이브러리 및 모듈 임포트
 import mysql.connector  # MySQL 데이터베이스 연결을 위한 라이브러리
 from mysql.connector import Error
@@ -244,6 +244,33 @@ def calculate_text_similarity(text1, text2):
         substring_ratio * 0.6   # 부분 문자열 일치
     )
 
+def check_color_match(input_color, db_color):
+    """
+    색상 그룹 매칭을 확인하는 함수
+    입력된 색상이 DB의 색상 그룹에 포함되는지 확인
+    """
+    # 노랑/주황/분홍/빨강/갈색 그룹
+    warm_colors = ['노랑', '주황', '분홍', '빨강', '갈색']
+    # 연두/초록/청록 그룹
+    green_colors = ['연두', '초록', '청록']
+    # 파랑/남색 그룹
+    blue_colors = ['파랑', '남색']
+    # 자주/보라 그룹
+    purple_colors = ['자주', '보라']
+
+    if input_color == "노랑/주황/분홍/빨강/갈색" and db_color in warm_colors:
+        return True
+    elif input_color == "연두/초록/청록" and db_color in green_colors:
+        return True
+    elif input_color == "파랑/남색" and db_color in blue_colors:
+        return True
+    elif input_color == "자주/보라" and db_color in purple_colors:
+        return True
+    elif input_color == db_color:  # 하양, 검정, 회색 등 단일 색상
+        return True
+    return False
+
+
 def identify_and_get_pill_info(pill_result):
     """
     알약 식별 및 정보 검색을 위한 통합 함수
@@ -251,13 +278,19 @@ def identify_and_get_pill_info(pill_result):
     logger.info("Starting integrated pill identification and info retrieval")
     
     text = ' '.join(pill_result.get('text', [])).strip()
-    color = pill_result.get('color', {}).get('specific', '').strip()
+    color_info = pill_result.get('color', {})
+    color_name = color_info.get('name', '').strip()  # 색상 그룹명 사용
+    specific_color = color_info.get('specific', '').strip()
     shape_info = pill_result.get('shape', {})
     shape = shape_info.get('predicted_class', '').strip() if isinstance(shape_info, dict) else ''
     
-    logger.info(f"Extracted text: {text}, color: {color}, shape: {shape}")
+    logger.info(f"\n입력 데이터:")
+    logger.info(f"- 텍스트: {text}")
+    logger.info(f"- 색상 그룹: {color_name}")
+    logger.info(f"- 구체적 색상: {specific_color}")
+    logger.info(f"- 모양: {shape}")
 
-    # 1단계: 텍스트 정확 일치 + (색상 AND/OR 모양)
+    # 첫 번째 단계: 텍스트 정확 일치
     if text:
         exact_query = """
         SELECT pi.itemSeq, pi.itemName, pi.entpName, pi.efcyQesitm, pi.useMethodQesitm, 
@@ -271,72 +304,50 @@ def identify_and_get_pill_info(pill_result):
         exact_results = db_query(exact_query, (text, text))
         
         if exact_results:
-            logger.info(f"Found exact matches: {len(exact_results)} pills")
-            # 정확한 텍스트 매치가 있으면, 색상과 모양 일치도로 정렬
+            logger.info("\n텍스트 매칭 결과:")
             scored_results = []
             for result in exact_results:
-                score = 100  # 기본 점수 (텍스트 정확 매치)
-                if result['COLOR_CLASS1'] == color:
-                    score += 20  # 색상 일치 보너스
-                if result['DRUG_SHAPE'] == shape:
-                    score += 10  # 모양 일치 보너스
-                scored_results.append((score, result))
-            
-            scored_results.sort(reverse=True, key=lambda x: x[0])
-            return process_results([result for _, result in scored_results])
-
-    # 2단계: 텍스트 앞부분 일치 검색 + 색상/모양 가중치
-    if text:
-        # 텍스트의 앞부분으로 검색 (예: TYLENOL -> TYLEN%)
-        min_length = min(len(text), 4)  # 최소 4글자까지만 사용
-        if min_length >= 2:  # 최소 2글자 이상일 때만 검색
-            text_prefix = text[:min_length]
-            prefix_query = """
-            SELECT pi.itemSeq, pi.itemName, pi.entpName, pi.efcyQesitm, pi.useMethodQesitm, 
-                   pi.atpnWarnQesitm, pi.atpnQesitm, pi.intrcQesitm, pi.seQesitm, 
-                   pi.depositMethodQesitm, pi.itemImage,
-                   pid.PRINT_FRONT, pid.PRINT_BACK, pid.COLOR_CLASS1, pid.DRUG_SHAPE
-            FROM pill_identification pid
-            JOIN pill_information pi ON pid.ITEM_SEQ = pi.itemSeq
-            WHERE (pid.PRINT_FRONT LIKE %s OR pid.PRINT_BACK LIKE %s)
-            """
-            prefix_results = db_query(prefix_query, (f"{text_prefix}%", f"{text_prefix}%"))
-            
-            if prefix_results:
-                logger.info(f"Found prefix matches: {len(prefix_results)} pills")
-                scored_results = []
-                for result in prefix_results:
-                    # 텍스트 유사도 점수 (0-60점)
-                    front_text = result.get('PRINT_FRONT', '') or ''
-                    back_text = result.get('PRINT_BACK', '') or ''
-                    text_sim = max(fuzz.ratio(text, front_text), fuzz.ratio(text, back_text))
-                    text_score = text_sim * 0.6
-                    
-                    # 색상 점수 (25점)
-                    color_score = 25 if result['COLOR_CLASS1'] == color else 0
-                    
-                    # 모양 점수 (15점)
-                    shape_score = 15 if result['DRUG_SHAPE'] == shape else 0
-                    
-                    total_score = text_score + color_score + shape_score
-                    
-                    if total_score >= 50:  # 최소 점수 상향 조정
-                        scored_results.append((total_score, result))
-                        logger.info(f"Scores for {result['itemName']}: text={text_score:.1f}, "
-                                  f"color={color_score}, shape={shape_score}, total={total_score:.1f}")
+                front_text = result.get('PRINT_FRONT', '') or ''
+                back_text = result.get('PRINT_BACK', '') or ''
+                text_score = max(fuzz.ratio(text, front_text), fuzz.ratio(text, back_text))
                 
-                if scored_results:
-                    scored_results.sort(reverse=True, key=lambda x: x[0])
-                    return process_results([result for _, result in scored_results[:5]])
+                # 색상과 모양 점수
+                color_score = 25 if check_color_match(color_name, result['COLOR_CLASS1']) else 0
+                shape_score = 15 if result['DRUG_SHAPE'] == shape else 0
+                
+                total_score = text_score * 0.6 + color_score + shape_score
+                
+                scored_results.append((total_score, result))
+                logger.info(f"\n약품명: {result['itemName']}")
+                logger.info(f"- 텍스트 비교:")
+                logger.info(f"  입력: {text}")
+                logger.info(f"  DB 앞면: {front_text}")
+                logger.info(f"  DB 뒷면: {back_text}")
+                logger.info(f"  텍스트 유사도: {text_score}%")
+                logger.info(f"- 색상 점수: {color_score}점 (DB: {result['COLOR_CLASS1']}, 입력: {color_name})")
+                logger.info(f"- 모양 점수: {shape_score}점 (DB: {result['DRUG_SHAPE']}, 입력: {shape})")
+                logger.info(f"- 총점: {total_score:.1f}점")
+            
+            # 점수순으로 정렬하고 상위 5개 선택 (최소 50점 이상)
+            scored_results.sort(reverse=True, key=lambda x: x[0])
+            filtered_results = [result for score, result in scored_results if score >= 50][:5]
+            
+            if filtered_results:
+                return process_results(filtered_results)
 
-    # 3단계: 색상과 모양으로만 검색 (텍스트가 없는 경우)
-    if (not text) and (color or shape):
+    # 두 번째 단계: 텍스트 유사도 + 색상/모양
+    if text and (color_name or shape):
         conditions = []
         params = []
         
-        if color:
-            conditions.append("pid.COLOR_CLASS1 = %s")
-            params.append(color)
+        # 기본 텍스트 검색 조건
+        conditions.append("(pid.PRINT_FRONT LIKE %s OR pid.PRINT_BACK LIKE %s)")
+        params.extend([f"%{text}%", f"%{text}%"])
+        
+        # 색상과 모양 조건 추가
+        if color_name:
+            conditions.append("pid.COLOR_CLASS1 LIKE %s")
+            params.append(f"%{color_name}%")
         if shape:
             conditions.append("pid.DRUG_SHAPE = %s")
             params.append(shape)
@@ -349,15 +360,53 @@ def identify_and_get_pill_info(pill_result):
         FROM pill_identification pid
         JOIN pill_information pi ON pid.ITEM_SEQ = pi.itemSeq
         WHERE {" AND ".join(conditions)}
-        LIMIT 5
         """
         
         results = db_query(query, tuple(params))
         if results:
-            logger.info(f"Found shape/color matches: {len(results)} pills")
-            return process_results(results)
+            logger.info("\n텍스트 + 색상/모양 매칭 결과:")
+            for result in results:
+                logger.info(f"\n약품명: {result['itemName']}")
+                logger.info(f"- 텍스트: {result['PRINT_FRONT']} / {result['PRINT_BACK']}")
+                logger.info(f"- 색상: {result['COLOR_CLASS1']}")
+                logger.info(f"- 모양: {result['DRUG_SHAPE']}")
+            return process_results(results[:5])
+
+    # 세 번째 단계: 색상/모양 매칭
+    if color_name or shape:
+        conditions = []
+        params = []
+        
+        if color_name:
+            conditions.append("pid.COLOR_CLASS1 LIKE %s")
+            params.append(f"%{color_name}%")
+        if shape:
+            conditions.append("pid.DRUG_SHAPE = %s")
+            params.append(shape)
+            
+        if conditions:
+            query = f"""
+            SELECT pi.itemSeq, pi.itemName, pi.entpName, pi.efcyQesitm, pi.useMethodQesitm, 
+                   pi.atpnWarnQesitm, pi.atpnQesitm, pi.intrcQesitm, pi.seQesitm, 
+                   pi.depositMethodQesitm, pi.itemImage,
+                   pid.PRINT_FRONT, pid.PRINT_BACK, pid.COLOR_CLASS1, pid.DRUG_SHAPE
+            FROM pill_identification pid
+            JOIN pill_information pi ON pid.ITEM_SEQ = pi.itemSeq
+            WHERE {" AND ".join(conditions)}
+            LIMIT 5
+            """
+            
+            results = db_query(query, tuple(params))
+            
+            if results:
+                logger.info("\n색상/모양 매칭 결과:")
+                for result in results:
+                    logger.info(f"\n약품명: {result['itemName']}")
+                    logger.info(f"- 색상: {result['COLOR_CLASS1']}")
+                    logger.info(f"- 모양: {result['DRUG_SHAPE']}")
+                return process_results(results)
     
-    logger.warning("No matching pills found")
+    logger.warning("\n매칭되는 결과를 찾을 수 없습니다.")
     return None
 
 # 결과 처리 함수
