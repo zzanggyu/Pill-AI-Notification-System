@@ -1,4 +1,4 @@
-## identify_and_get_pill_info(pill_result) 연구하기
+## identify_and_get_pill_info(pill_result) 연구하기 ###
 # 필요한 라이브러리 및 모듈 임포트
 import mysql.connector  # MySQL 데이터베이스 연결을 위한 라이브러리
 from mysql.connector import Error
