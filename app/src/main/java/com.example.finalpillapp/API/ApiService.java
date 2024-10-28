@@ -25,7 +25,7 @@ public interface ApiService {
     Call<ApiResponse<List<PillInfo>>> analyzePill(@Body PillImageRequest request);
 
     @POST("/legal-notice")
-    Call<ApiResponse<Void>> saveLegalNotice(@Body LegalNoticeRequest request);
+    Call<ApiResponse<Void>> sendLegalNotice(@Body LegalNoticeRequest request);
 
     @GET("/check-legal-notice")
     Call<ApiResponse<Void>> checkLegalNotice(@Query("userId") String userId);

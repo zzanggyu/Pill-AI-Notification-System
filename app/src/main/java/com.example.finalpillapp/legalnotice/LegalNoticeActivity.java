@@ -44,7 +44,7 @@ public class LegalNoticeActivity extends AppCompatActivity {
         // 동의 요청 객체 생성
         LegalNoticeRequest request = new LegalNoticeRequest(userId, true);
 
-        Call<ApiResponse<Void>> call = apiService.saveLegalNotice(request);
+        Call<ApiResponse<Void>> call = apiService.sendLegalNotice(request);
         call.enqueue(new Callback<ApiResponse<Void>>() {
             @Override
             public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
