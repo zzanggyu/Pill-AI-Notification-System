@@ -1,4 +1,3 @@
-// LegalNoticeRequest.java
 package com.example.finalpillapp.legalnotice;
 
 public class LegalNoticeRequest {
@@ -6,7 +5,7 @@ public class LegalNoticeRequest {
     private boolean accepted;
     private String date;
 
-    public LegalNoticeRequest(String userId, boolean accepted, String date) {
+    public LegalNoticeRequest(String userId,String date, boolean accepted) {
         this.userId = userId;
         this.accepted = accepted;
         this.date = date;

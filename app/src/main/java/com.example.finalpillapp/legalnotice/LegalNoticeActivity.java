@@ -48,7 +48,7 @@ import retrofit2.Response;
         String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
 
         // 동의 요청 객체 생성
-        LegalNoticeRequest request = new LegalNoticeRequest(userId, true, currentDate);
+        LegalNoticeRequest request = new LegalNoticeRequest(userId, currentDate, true);
 
         Call<ApiResponse<Void>> call = apiService.sendLegalNotice(request);
         call.enqueue(new Callback<ApiResponse<Void>>() {
