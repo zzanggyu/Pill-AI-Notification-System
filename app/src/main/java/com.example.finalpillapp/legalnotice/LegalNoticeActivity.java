@@ -16,6 +16,10 @@ import com.example.finalpillapp.API.RetrofitClientInstance;
 import com.example.finalpillapp.Main.MainActivity;
 import com.example.pillapp.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -32,7 +36,6 @@ public class LegalNoticeActivity extends AppCompatActivity {
         btnAgreeStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // 서버에 사용자 동의 정보 전송
                 sendAgreementToServer("user_id_value"); // 실제 사용자 ID로 변경
             }
         });
@@ -41,8 +44,11 @@ public class LegalNoticeActivity extends AppCompatActivity {
     private void sendAgreementToServer(String userId) {
         ApiService apiService = RetrofitClientInstance.getApiService();
 
+        // 현재 날짜 생성
+        String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
         // 동의 요청 객체 생성
-        LegalNoticeRequest request = new LegalNoticeRequest(userId, true);
+        LegalNoticeRequest request = new LegalNoticeRequest(userId, true, currentDate);
 
         Call<ApiResponse<Void>> call = apiService.sendLegalNotice(request);
         call.enqueue(new Callback<ApiResponse<Void>>() {
