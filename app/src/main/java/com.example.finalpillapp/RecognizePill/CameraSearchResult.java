@@ -33,21 +33,23 @@ public class CameraSearchResult extends AppCompatActivity {
 
         pillListView = findViewById(R.id.pill_list);
 
-        // Intent로 전달된 JSON 데이터를 받아와 파싱
+        // Intent로 전달된 JSON 데이터를 받아와 List로 변환
         String pillInfoJson = getIntent().getStringExtra("pillInfoList");
+
         if (pillInfoJson != null) {
+            // JSON 데이터를 List<PillInfo>로 변환
             pillInfoList = new Gson().fromJson(pillInfoJson, new TypeToken<List<PillInfo>>() {}.getType());
 
-            // 어댑터 설정 및 클릭 리스너 설정
+            // 어댑터를 설정하고 클릭 리스너를 추가하여 클릭 시 상세 화면으로 이동
             PillAdapter adapter = new PillAdapter(this, pillInfoList);
             adapter.setOnItemClickListener(pill -> {
-                // 클릭된 아이템의 상세 정보 액티비티로 이동
                 Intent intent = new Intent(CameraSearchResult.this, PillDetailActivity.class);
                 intent.putExtra("selectedPill", new Gson().toJson(pill));
                 startActivity(intent);
             });
             pillListView.setAdapter(adapter);
         } else {
+            // 데이터가 없을 경우 오류 메시지 표시
             Toast.makeText(this, "알약 정보를 가져올 수 없습니다.", Toast.LENGTH_SHORT).show();
         }
     }
