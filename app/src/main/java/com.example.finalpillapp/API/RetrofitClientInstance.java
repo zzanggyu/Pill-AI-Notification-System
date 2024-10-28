@@ -19,9 +19,9 @@ public class RetrofitClientInstance {
 
             // OkHttpClient에 타임아웃 설정과 로그 인터셉터 추가
             OkHttpClient okHttpClient = new OkHttpClient.Builder()
-                    .connectTimeout(5, TimeUnit.SECONDS)  // 연결 타임아웃: 60초
-                    .writeTimeout(5, TimeUnit.SECONDS)    // 쓰기 타임아웃: 60초
-                    .readTimeout(5, TimeUnit.SECONDS)     // 읽기 타임아웃: 60초
+                    .connectTimeout(60, TimeUnit.SECONDS)  // 연결 타임아웃: 60초
+                    .writeTimeout(60, TimeUnit.SECONDS)    // 쓰기 타임아웃: 60초
+                    .readTimeout(60, TimeUnit.SECONDS)     // 읽기 타임아웃: 60초
                     .addInterceptor(loggingInterceptor)    // 로그 인터셉터 추가
                     .build();
 

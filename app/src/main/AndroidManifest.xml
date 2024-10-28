@@ -66,7 +66,6 @@
         <activity android:name="com.example.finalpillapp.Alarm.AlertSettingsActivity" android:exported="true" />
         <activity android:name="com.example.finalpillapp.MyPage.MyPageActivity" android:exported="true" />
         <activity android:name="com.example.finalpillapp.MyPage.PersonalInfoActivity" android:exported="true" />
-        <activity android:name="com.example.finalpillapp.SearchPill.SearchResultsActivity" android:exported="true" />
         <activity android:name="com.example.finalpillapp.SearchPill.SearchActivity" android:exported="true"/>
         <activity android:name="com.example.finalpillapp.NameSearch.NameSearchActivity" android:exported="true"/>
         <activity android:name="com.example.finalpillapp.NameSearch.RecentSearchesActivity" android:exported="true"/>
