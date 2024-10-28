@@ -24,7 +24,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class LegalNoticeActivity extends AppCompatActivity {
+/*public class LegalNoticeActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +67,25 @@ public class LegalNoticeActivity extends AppCompatActivity {
             public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
                 Toast.makeText(LegalNoticeActivity.this, "서버 연결 실패", Toast.LENGTH_SHORT).show();
                 Log.e("LegalNoticeActivity", "서버 호출 실패", t);
+            }
+        });
+    }
+}*/
+public class LegalNoticeActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_legal_notice);
+
+        ImageButton btnAgreeStart = findViewById(R.id.agree_button);
+
+        btnAgreeStart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 동의 버튼을 누르면 바로 MainActivity로 이동
+                startActivity(new Intent(LegalNoticeActivity.this, MainActivity.class));
+                finish();
             }
         });
     }
