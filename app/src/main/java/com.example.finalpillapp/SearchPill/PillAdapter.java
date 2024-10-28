@@ -44,7 +44,7 @@ public class PillAdapter extends ArrayAdapter<PillInfo> {
 
         itemName.setText(pill.getItemName());
         efcyQesitm.setText(pill.getEfcyQesitm());
-        Picasso.get().load(pill.getItemImage()).into(itemImage);
+        Picasso.get().load(pill.getImageUrl()).into(itemImage);
 
         convertView.setOnClickListener(v -> {
             if (onItemClickListener != null) {

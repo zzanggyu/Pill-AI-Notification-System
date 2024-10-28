@@ -67,7 +67,7 @@ public class PillDetailActivity extends AppCompatActivity {
         // 데이터 설정
         pillNameTextView.setText(pill.getItemName());
         pillEffectTextView.setText("효능: " + pill.getEfcyQesitm());
-        Picasso.get().load(pill.getItemImage()).into(pillImageView);
+        Picasso.get().load(pill.getImageUrl()).into(pillImageView);
 
         // 각 상세 정보 버튼 설정
         setupDetailButtons();
@@ -103,9 +103,9 @@ public class PillDetailActivity extends AppCompatActivity {
         pillJson.addProperty("itemName", pill.getItemName());
         pillJson.addProperty("efcyQesitm", pill.getEfcyQesitm());
         pillJson.addProperty("atpnQesitm", pill.getAtpnQesitm());
-        pillJson.addProperty("seQesitm", pill.getSeQesitm());
+        pillJson.addProperty("seQesitm", pill.getEfficacy());
         pillJson.addProperty("etcotc", pill.getEtcotc());
-        pillJson.addProperty("itemImage", pill.getItemImage());
+        pillJson.addProperty("itemImage", pill.getImageUrl());
 
         ApiService apiService = RetrofitClientInstance.getApiService();
         Call<ResponseBody> call = apiService.addPill(pillJson);
