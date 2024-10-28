@@ -718,7 +718,7 @@ def search_by_name():
 
     drug_query = """
     SELECT itemSeq, itemName, efcyQesitm, atpnQesitm, seQesitm, etcotc, itemImage 
-    FROM normal__drug 
+    FROM normal_drug 
     WHERE itemName LIKE %s
     """
     drug_results = db_query(drug_query, ("%" + item_name + "%",))
