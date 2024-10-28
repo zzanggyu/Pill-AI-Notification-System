@@ -15,6 +15,8 @@ import com.example.finalpillapp.API.ApiResponse;
 import com.example.finalpillapp.API.ApiService;
 import com.example.finalpillapp.API.RetrofitClientInstance;
 import com.example.finalpillapp.PillInfo.PillInfo;
+import com.example.finalpillapp.RecognizePill.CameraSearchResult;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +33,8 @@ public class SearchActivity extends AppCompatActivity {
 
     // 체크박스 변수 추가
     private CheckBox coldCheckBox, indigestionCheckBox, feverCheckBox, headacheCheckBox, dizzinessCheckBox, insomniaCheckBox, fatigueCheckBox;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,10 +93,10 @@ public class SearchActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     List<PillInfo> searchResults = response.body().getData();
                     if (searchResults != null && !searchResults.isEmpty()) {
-                        // 검색 결과 처리: Intent를 통해 SearchResultsActivity로 전환
+                        // 검색 결과 처리: CameraSearchResult로 전환
                         Log.d("SearchActivity", "검색 결과 개수: " + searchResults.size());
-                        Intent intent = new Intent(SearchActivity.this, SearchResultsActivity.class);
-                        intent.putParcelableArrayListExtra("pillList", new ArrayList<>(searchResults));
+                        Intent intent = new Intent(SearchActivity.this, CameraSearchResult.class);
+                        intent.putExtra("pillInfoList", new Gson().toJson(searchResults));  // JSON으로 변환하여 전달
                         startActivity(intent);
                     } else {
                         Toast.makeText(SearchActivity.this, "검색 결과가 없습니다.", Toast.LENGTH_SHORT).show();
@@ -110,4 +114,5 @@ public class SearchActivity extends AppCompatActivity {
             }
         });
     }
+
 }

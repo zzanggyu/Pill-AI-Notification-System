@@ -1,16 +1,24 @@
+// LegalNoticeActivity.java
 package com.example.finalpillapp.legalnotice;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.finalpillapp.API.ApiResponse;
+import com.example.finalpillapp.API.ApiService;
+import com.example.finalpillapp.API.RetrofitClientInstance;
 import com.example.finalpillapp.Main.MainActivity;
 import com.example.pillapp.R;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class LegalNoticeActivity extends AppCompatActivity {
 
@@ -19,21 +27,38 @@ public class LegalNoticeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_legal_notice);
 
-        // "동의 및 시작" 버튼을 찾습니다.
         ImageButton btnAgreeStart = findViewById(R.id.agree_button);
 
-        // 버튼 클릭 리스너 설정
         btnAgreeStart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("LegalNoticeActivity", "동의 및 시작 버튼 클릭됨");
+                sendAgreementToServer("user_id_value"); // 실제 사용자 ID로 대체
+            }
+        });
+    }
 
-                // MainActivity로 이동
-                Intent intent = new Intent(LegalNoticeActivity.this, MainActivity.class);
-                startActivity(intent);
+    private void sendAgreementToServer(String userId) {
+        ApiService apiService = RetrofitClientInstance.getApiService();
 
-                // 현재 액티비티 종료
-                finish();
+        // LegalNoticeRequest 객체 생성
+        LegalNoticeRequest request = new LegalNoticeRequest(userId, true);
+
+        Call<ApiResponse<Void>> call = apiService.saveLegalNotice(request);
+        call.enqueue(new Callback<ApiResponse<Void>>() {
+            @Override
+            public void onResponse(Call<ApiResponse<Void>> call, Response<ApiResponse<Void>> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    // 성공적으로 동의가 서버에 기록됨
+                    startActivity(new Intent(LegalNoticeActivity.this, MainActivity.class));
+                    finish();
+                } else {
+                    Toast.makeText(LegalNoticeActivity.this, "서버에 동의 정보 전송 실패", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse<Void>> call, Throwable t) {
+                Toast.makeText(LegalNoticeActivity.this, "서버 연결 실패", Toast.LENGTH_SHORT).show();
             }
         });
     }

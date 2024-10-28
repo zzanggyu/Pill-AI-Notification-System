@@ -3,34 +3,45 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="16dp">
+    android:padding="8dp"
+    android:background="?android:attr/selectableItemBackground">
 
+    <!-- 알약 이미지 -->
     <ImageView
         android:id="@+id/itemImage"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginEnd="16dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center_vertical"
+        android:scaleType="centerCrop"
         android:contentDescription="Pill Image" />
 
+    <!-- 알약 정보 레이아웃 -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_marginStart="16dp">
 
+        <!-- 알약 이름 -->
         <TextView
             android:id="@+id/itemName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Pill Name"
+            android:text="알약 이름"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:textColor="#000000" />
 
+        <!-- 알약 효능 -->
         <TextView
             android:id="@+id/efcyQesitm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Efficacy"
-            android:textSize="14sp" />
+            android:text="효능 설명"
+            android:textSize="14sp"
+            android:textColor="#666666"
+            android:maxLines="2"
+            android:ellipsize="end" />
     </LinearLayout>
 </LinearLayout>

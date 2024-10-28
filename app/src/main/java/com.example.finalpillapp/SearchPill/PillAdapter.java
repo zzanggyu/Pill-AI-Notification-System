@@ -32,19 +32,23 @@ public class PillAdapter extends ArrayAdapter<PillInfo> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder viewHolder;
+
         if (convertView == null) {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_drug, parent, false);
+            viewHolder = new ViewHolder(convertView);
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
         PillInfo pill = getItem(position);
 
-        TextView itemName = convertView.findViewById(R.id.itemName);
-        TextView efcyQesitm = convertView.findViewById(R.id.efcyQesitm);
-        ImageView itemImage = convertView.findViewById(R.id.itemImage);
-
-        itemName.setText(pill.getItemName());
-        efcyQesitm.setText(pill.getEfcyQesitm());
-        Picasso.get().load(pill.getItemImage()).into(itemImage);
+        if (pill != null) {
+            viewHolder.itemName.setText(pill.getItemName());
+            viewHolder.efcyQesitm.setText(pill.getEfcyQesitm());
+            Picasso.get().load(pill.getImageUrl()).placeholder(R.drawable.sample_pill_image).into(viewHolder.itemImage);
+        }
 
         convertView.setOnClickListener(v -> {
             if (onItemClickListener != null) {
@@ -53,5 +57,17 @@ public class PillAdapter extends ArrayAdapter<PillInfo> {
         });
 
         return convertView;
+    }
+
+    static class ViewHolder {
+        TextView itemName;
+        TextView efcyQesitm;
+        ImageView itemImage;
+
+        ViewHolder(View view) {
+            itemName = view.findViewById(R.id.itemName);
+            efcyQesitm = view.findViewById(R.id.efcyQesitm);
+            itemImage = view.findViewById(R.id.itemImage);
+        }
     }
 }
