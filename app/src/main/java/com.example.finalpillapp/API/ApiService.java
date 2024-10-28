@@ -24,18 +24,24 @@ public interface ApiService {
     @POST("analyze_pill")
     Call<ApiResponse<List<PillInfo>>> analyzePill(@Body PillImageRequest request);
 
-    @POST("/legal-notice")
+    @Headers({
+            "Content-Type: application/json",
+            "Accept: application/json"
+    })
+
+
+    @POST("legal-notice")
     Call<ApiResponse<Void>> sendLegalNotice(@Body LegalNoticeRequest request);
 
-    @GET("/check-legal-notice")
+    @GET("check-legal-notice")
     Call<ApiResponse<Void>> checkLegalNotice(@Query("userId") String userId);
 
     // 이름으로 검색하는 메서드 - PillInfo 반환
-    @GET("/pills/searchByName")
+    @GET("pills/searchByName")
     Call<ApiResponse<List<PillInfo>>> searchPillsByName(@Query("itemName") String itemName);
 
     // 증상으로 검색하는 메서드 - PillInfo 반환
-    @GET("/pills/search")
+    @GET("pills/search")
     Call<ApiResponse<List<PillInfo>>> searchPillsBySymptom(@Query("symptom") String symptom, @Query("selectedSymptoms") List<String> selectedSymptoms);
 
     /*@POST("/pills/add")
@@ -44,20 +50,20 @@ public interface ApiService {
     @POST("/pills/delete")
     Call<ApiResponse<Void>> deletePill(@Body DeletePillRequest request);*/
 
-    @POST("/personal-info/save")
+    @POST("personal-info/save")
     Call<ApiResponse<Void>> savePersonalInfo(@Body PersonalInfoActivity request);
 
     /*@POST("/personal-info/reset")
     Call<ApiResponse<Void>> resetPersonalInfo(@Body UserIdRequest request);*/
 
-    @GET("/getDrugInteractions")
+    @GET("getDrugInteractions")
     Call<ApiResponse<Void>> getDrugInteractions(@Query("drugItemName") String drugItemName);
 
-    @GET("/personal-info")
+    @GET("personal-info")
     Call<ApiResponse<Void>> getPersonalInfo(@Query("userId") String userId);
 
     // 추가된 Search_DB_API의 메서드들
-    @GET("/api/v1/pills/search")
+    @GET("pills/search")
     Call<ApiResponse<List<PillInfo>>> searchPills(
             @Query("symptom") String symptom,
             @Query("selectedSymptoms") List<String> selectedSymptoms
@@ -65,9 +71,9 @@ public interface ApiService {
 
 
 
-    @POST("/api/v1/pills/add")
+    @POST("pills/add")
     Call<ResponseBody> addPill(@Body JsonObject pillJson);
 
-    @GET("api/v1/pills/{itemSeq}")
+    @GET("pills/{itemSeq}")
     Call<PillInfo> getPillById(@Path("itemSeq") int itemSeq);
 }

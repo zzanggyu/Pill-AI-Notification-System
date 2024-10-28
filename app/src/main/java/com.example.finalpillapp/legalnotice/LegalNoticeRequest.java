@@ -2,37 +2,31 @@ package com.example.finalpillapp.legalnotice;
 
 public class LegalNoticeRequest {
     private String userId;
-    private boolean accepted;
     private String date;
+    private boolean accepted;
 
-    public LegalNoticeRequest(String userId,String date, boolean accepted) {
+    public LegalNoticeRequest(String userId, String date, boolean accepted) {
         this.userId = userId;
-        this.accepted = accepted;
         this.date = date;
-    }
-
-    // Getters and setters
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public boolean isAccepted() {
-        return accepted;
-    }
-
-    public void setAccepted(boolean accepted) {
         this.accepted = accepted;
     }
 
-    public String getDate() {
-        return date;
-    }
+    // Getters
+    public String getUserId() { return userId; }
+    public String getDate() { return date; }
+    public boolean isAccepted() { return accepted; }
 
-    public void setDate(String date) {
-        this.date = date;
+    // Setters
+    public void setUserId(String userId) { this.userId = userId; }
+    public void setDate(String date) { this.date = date; }
+    public void setAccepted(boolean accepted) { this.accepted = accepted; }
+
+    @Override
+    public String toString() {
+        return "LegalNoticeRequest{" +
+                "userId='" + userId + '\'' +
+                ", date='" + date + '\'' +
+                ", accepted=" + accepted +
+                '}';
     }
 }
