@@ -1,0 +1,80 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.8"
+        android:background="#1DC8BD"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/title_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:contentDescription="타이틀 이미지 설명"
+            android:scaleType="fitCenter"
+            android:src="@drawable/title_small" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:text="법적 고지"
+            android:textColor="#FFFFFF"
+            android:textSize="40sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginTop="16dp" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#FFFFFF"
+            android:padding="24dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="알약 정보 알림e 앱에 사용되고 있는 약물정보 컨텐츠는 식품의약품안전처 및 약학정보원에서 엄격하게 검토된 데이터를 중심으로 개발되었습니다.\n\n그러나 제공되는 그 어떤 정보도 환자 진료와 관련된 의사, 약사 등 보건의료인들의 전문 지식이나 전문적 판단을 대신할 수는 없다는 것을 명백히 밝히는 바입니다.\n\n또한 본 앱에서 주의나 경고를 하지 않는 의약품이라고 해서 모든 복용자에게 안전성이나 유효성이 보장되지 않음을 밝힙니다.\n\n따라서 알약정보알림e 앱의 정보를 활용함에 있어 모든 책임은 이를 이용하는 본인에게 있으며, 어떠한 의료사고나 약화사고, 약물 오남용 발생시에 본 어플을 제공하는 ‘알약정보알림e’는 책임을 지지 않습니다."
+                android:textSize="16sp"
+                android:lineSpacingExtra="4dp"
+                android:textColor="#333333"
+                android:background="#F7F7F7"
+                android:padding="16dp" />
+        </LinearLayout>
+    </ScrollView>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="해당 고지에 동의하지 않으시면\n‘알약 정보 알림’ 이용이 불가합니다."
+        android:textSize="14sp"
+        android:textColor="#999999"
+        android:gravity="center"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp" />
+
+    <ImageButton
+        android:id="@+id/agree_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/agree_button"
+        android:contentDescription="동의 버튼 설명"
+        android:background="?attr/selectableItemBackground"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="16dp" />
+</LinearLayout>

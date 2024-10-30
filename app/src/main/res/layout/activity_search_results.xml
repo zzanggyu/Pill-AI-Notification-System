@@ -1,0 +1,111 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FAFAFA"
+        android:padding="16dp">
+
+        <ImageButton
+            android:id="@+id/back_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackground"
+            android:src="@drawable/ic_back"
+            android:contentDescription="back_button"/>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="검색된 알약"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <ListView
+        android:id="@+id/pill_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="8dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="4dp">
+
+        <ImageButton
+            android:id="@+id/select_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:src="@drawable/select_button_image"
+            android:padding="4dp"
+            android:contentDescription="select_button"/>
+
+        <ImageButton
+            android:id="@+id/research_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:src="@drawable/research_button_image"
+            android:padding="4dp"
+            android:contentDescription="research_button"/>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom">
+
+        <ImageView
+            android:id="@+id/navigation_bar"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/navigation_bar_image" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/alarm_button"
+                android:layout_width="0dp"
+                android:layout_height="90dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:contentDescription="alarm_button"/>
+
+            <Button
+                android:id="@+id/home_button"
+                android:layout_width="0dp"
+                android:layout_height="90dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:contentDescription="home_button"/>
+
+            <Button
+                android:id="@+id/profile_button"
+                android:layout_width="0dp"
+                android:layout_height="90dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:contentDescription="profile_button"/>
+        </LinearLayout>
+    </RelativeLayout>
+</LinearLayout>

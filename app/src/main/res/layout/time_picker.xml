@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 최상위 LinearLayout: 세로 방향으로 자식 뷰들을 배치 -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- 제목 TextView: "알람 시간 설정" 텍스트 표시 -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="알람 시간 설정"
+        android:textSize="18sp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- 시간 선택을 위한 내부 LinearLayout: 가로 방향으로 자식 뷰들을 배치 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- 시간 선택 Spinner -->
+        <Spinner
+            android:id="@+id/spinnerHour"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+        <!-- 구분자 TextView: ":" 표시 -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=":"
+            android:textSize="18sp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"/>
+        <!-- 분 선택 Spinner -->
+        <Spinner
+            android:id="@+id/spinnerMinute"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+</LinearLayout>
