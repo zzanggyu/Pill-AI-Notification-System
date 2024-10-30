@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:gravity="center_vertical"
+    android:background="#DADADA">
+
+    <!-- 이름 변경 버튼을 이미지 버튼으로 변경 -->
+    <ImageButton
+        android:id="@+id/renameButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/renamebtn"
+        android:background="?attr/selectableItemBackground"
+        android:contentDescription="renameButton"/>
+
+    <TextView
+        android:id="@+id/groupName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="그룹 이름"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:contentDescription="groupName"/>
+
+    <!-- 삭제 버튼을 이미지 버튼으로 변경 -->
+    <ImageButton
+        android:id="@+id/deleteButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/deletebtn"
+        android:background="?attr/selectableItemBackground"
+        android:contentDescription="deleteButton"/>
+
+</LinearLayout>
