@@ -20,6 +20,7 @@ import com.example.finalpillapp.PillImformation.UsageActivity;
 import com.example.finalpillapp.PillImformation.WarningActivity;
 import com.example.finalpillapp.PillInfo.PillInfo;
 import com.example.pillapp.R;
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import com.google.gson.JsonObject;
@@ -42,6 +43,16 @@ public class PillDetailActivity extends AppCompatActivity {
 
         // Intent로 전달된 PillInfo 객체 복원
         pill = getIntent().getParcelableExtra("selectedPill");
+
+        // JSON 문자열로 전달된 경우를 처리
+        if (pill == null) {
+            String pillJson = getIntent().getStringExtra("selectedPill");
+            if (pillJson != null) {
+                pill = new Gson().fromJson(pillJson, PillInfo.class);
+            }
+        }
+
+        // 복원 실패 시 오류 처리
         if (pill == null) {
             Log.e("PillDetailActivity", "Pill 객체가 null입니다.");
             Toast.makeText(this, "약 정보를 불러오지 못했습니다.", Toast.LENGTH_SHORT).show();
