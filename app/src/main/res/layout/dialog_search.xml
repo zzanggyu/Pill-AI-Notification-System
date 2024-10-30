@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/searchInput"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:hint="검색어 입력" />
+
+    <!-- 검색 버튼을 이미지 버튼으로 변경 -->
+    <ImageButton
+        android:id="@+id/searchButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_pillsearch"
+        android:background="?attr/selectableItemBackground"
+        android:layout_marginTop="8dp"
+        android:contentDescription="searchButton"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/searchResultsList"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp" />
+
+    <!-- 취소 버튼을 이미지 버튼으로 변경 -->
+    <ImageButton
+        android:id="@+id/cancelButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_cancel"
+        android:background="?attr/selectableItemBackground"
+        android:layout_marginTop="8dp"
+        android:contentDescription="cancelButton"/>
+</LinearLayout>

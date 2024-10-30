@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:gravity="center_vertical"> <!-- 수직 중앙 정렬 -->
+
+    <ImageView
+        android:id="@+id/medicationImage"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:src="@drawable/ic_default_image"
+        android:contentDescription="약물 이미지"
+        />
+
+    <TextView
+        android:id="@+id/medicationName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingStart="8dp"
+        android:text="약물 이름"
+        android:textSize="18sp" />
+
+    <!-- 추가 버튼 -->
+    <ImageButton
+        android:id="@+id/addButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_pilladd"
+        android:background="?attr/selectableItemBackground"
+        android:contentDescription="addButton"/>
+
+    <!-- 삭제 버튼 -->
+    <ImageButton
+        android:id="@+id/deleteButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:src="@drawable/ic_pilldelete"
+        android:background="?attr/selectableItemBackground"
+        android:layout_marginStart="8dp"
+        android:contentDescription="deleteButton"/>
+</LinearLayout>
