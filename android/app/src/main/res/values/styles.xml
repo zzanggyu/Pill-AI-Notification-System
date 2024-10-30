@@ -1,0 +1,9 @@
+<resources>
+    <!-- Material3 DayNight NoActionBar 테마 -->
+    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- 이미 정의된 색상을 사용 -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryVariant">@color/colorPrimaryVariant</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+    </style>
+</resources>

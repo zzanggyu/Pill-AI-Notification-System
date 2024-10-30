@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 기본 색상 -->
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryVariant">#3700B3</color> <!-- colorPrimaryVariant 추가 -->
+    <color name="colorAccent">#03DAC5</color>
+
+    <!-- 배경 색상 -->
+    <color name="backgroundLight">#FFFFFF</color>
+    <color name="backgroundDark">#F5F5F5</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="light_gray">#D3D3D3</color>
+
+    <!-- 텍스트 색상 -->
+    <color name="textPrimary">#000000</color>
+    <color name="textSecondary">#757575</color>
+
+    <!-- 버튼 및 아이콘 색상 -->
+    <color name="buttonColor">#FF5722</color> <!-- 추가 버튼 색상 -->
+    <color name="searchIconColor">#9E9E9E</color> <!-- 검색 아이콘 색상 -->
+    <color name="warningColor">#FF5252</color> <!-- 경고 아이콘 색상 -->
+
+    <!-- 경계 및 그림자 색상 -->
+    <color name="dividerColor">#BDBDBD</color>
+    <color name="shadowColor">#000000</color>
+</resources>

@@ -1,0 +1,78 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FAFAFA"
+        android:padding="16dp">
+
+        <ImageButton
+            android:id="@+id/back_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackground"
+            android:src="@drawable/ic_back"
+            android:contentDescription="back_button"/>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="카메라로 검색"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+    </RelativeLayout>
+
+    <TextureView
+        android:id="@+id/camera_preview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/top_bar"/>
+
+    <View
+        android:id="@+id/camera_square"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_centerInParent="true"
+        android:background="@android:color/transparent"
+        android:foreground="@drawable/camera_square" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/camera_square"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="10dp"
+        android:text="검색할 알약을 사각형 중앙에\n위치하게 촬영해 주세요."
+        android:textColor="#000000"
+        android:textSize="24sp"
+        android:gravity="center"/>
+
+    <TextView
+        android:id="@+id/instruction_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/camera_square"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="흰 배경에서 촬영하면\n인식률이 높아집니다."
+        android:textSize="24sp"
+        android:textColor="#000000"
+        android:gravity="center"/>
+
+    <ImageButton
+        android:id="@+id/capture_button"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/camera_btn"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="촬영 버튼" />
+</RelativeLayout>
