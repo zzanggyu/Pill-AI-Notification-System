@@ -7,13 +7,13 @@ import com.google.gson.annotations.SerializedName;
 
 public class PillInfo implements Parcelable {
 
-    @SerializedName("item_seq")
+    @SerializedName("itemSeq")
     private String itemSeq;
 
-    @SerializedName("item_name")
+    @SerializedName("itemName")
     private String itemName;
 
-    @SerializedName("company_name")
+    @SerializedName("companyName")
     private String companyName;
 
     @SerializedName("efficacy")
@@ -31,19 +31,19 @@ public class PillInfo implements Parcelable {
     @SerializedName("interactions")
     private String interactions;
 
-    @SerializedName("side_effects")
+    @SerializedName("sideeffects")
     private String sideEffects;
 
     @SerializedName("storage")
     private String storage;
 
-    @SerializedName("image_url")
+    @SerializedName("itemImage")
     private String imageUrl;
 
-    @SerializedName("print_front")
+    @SerializedName("printfront")
     private String printFront;
 
-    @SerializedName("print_back")
+    @SerializedName("printback")
     private String printBack;
 
     @SerializedName("color")
