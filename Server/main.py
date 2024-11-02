@@ -22,7 +22,7 @@ from datetime import datetime
 import os
 
 # IP 주소
-PUBLIC_IP = "121.132.196.27"
+PUBLIC_IP = "localhost"
 MODEL_SERVER_URL = f"http://{PUBLIC_IP}:5000/process_image"  # 모델 서버 URL
 
 # v1 API (버전 1) Blueprint 생성
@@ -41,7 +41,7 @@ DB_CONFIG = {
     'host': 'localhost',  # 호스트 설정
     'database': 'pill2',  # 데이터베이스 이름
     'user': 'root',  # 권한이 부여된 사용자 아이디
-    'password': '0000'  # 권한이 부여된 사용자 비밀번호
+    'password': 'ppap!@'  # 권한이 부여된 사용자 비밀번호
 }
 
 # 로깅 설정
@@ -360,7 +360,8 @@ def create_tables():
             seQesitm TEXT,
             etcotc VARCHAR(50),
             itemImage TEXT,
-            createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE KEY unique_user_pill (user_id, itemSeq)
         );
         """
         cursor.execute(create_user_pill_table)
@@ -732,40 +733,32 @@ def add_pill():
     data = request.get_json()
     required_fields = ['user_id', 'itemSeq', 'itemName', 'efcyQesitm', 'atpnQesitm', 'seQesitm', 'etcotc', 'itemImage']
     
+    # 필수 필드 검증
     if not all(field in data for field in required_fields):
-        return create_response(False, "Missing required fields", error="Incomplete data")
+        return create_response(False, "필수 항목이 누락되었습니다.", error="Incomplete data")
 
-    query = """
-    INSERT INTO user_pill (user_id, itemSeq, itemName, efcyQesitm, atpnQesitm, seQesitm, etcotc, itemImage) 
-    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-    """
-    params = tuple(data[field] for field in required_fields)
-    
-    result = db_query(query, params)
-    
-    if result:
-        return create_response(True, "Pill added successfully")
-    else:
-        return create_response(False, "Failed to add pill", error="Database error")
-
-# 약물 삭제 엔드포인트
-@api_v1.route('/pills/delete', methods=['POST'])
-@error_handler
-def delete_pill():
-    data = request.get_json()
-    item_seq = data.get('itemSeq')
-    user_id = data.get('user_id')
-
-    if not item_seq or not user_id:
-        return create_response(False, "Missing parameters", error="Incomplete data")
-
-    sql = "DELETE FROM user_pill WHERE itemSeq = %s AND user_id = %s"
-    result = db_query(sql, (item_seq, user_id))
-
-    if result:
-        return create_response(True, "Pill deleted successfully")
-    else:
-        return create_response(False, "Failed to delete pill", error="Database error")
+    try:
+        # 새로운 알약 추가 시도
+        insert_query = """
+            INSERT INTO user_pill 
+                (user_id, itemSeq, itemName, efcyQesitm, atpnQesitm, seQesitm, etcotc, itemImage) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        params = tuple(data[field] for field in required_fields)
+        
+        try:
+            result = db_query(insert_query, params)
+            return create_response(True, "알약이 성공적으로 추가되었습니다.")
+            
+        except Error as e:
+            # 중복 키 에러 처리 (MySQL 에러 코드 1062)
+            if e.errno == 1062:
+                return create_response(False, "이미 추가된 알약입니다.", error="Duplicate entry")
+            else:
+                raise e
+            
+    except Exception as e:
+        return create_response(False, "알약 추가 중 오류가 발생했습니다.", error=str(e))
 
 # id에 해당하는 약물 정보 불러오기
 @api_v1.route('/pills/user', methods=['GET'])
