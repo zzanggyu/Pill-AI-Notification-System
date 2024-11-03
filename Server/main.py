@@ -2,7 +2,7 @@
 알약 정보 제공 서버 (Main Server)
 
 작성자: [김현규,정재호]
-마지막 수정: 2024-10-27
+마지막 수정: 2024-11-04
 """
 ## identify_and_get_pill_info(pill_result) 연구하기 ### 10월 27일
 # 필요한 라이브러리 및 모듈 임포트
@@ -41,7 +41,7 @@ DB_CONFIG = {
     'host': 'localhost',  # 호스트 설정
     'database': 'pill2',  # 데이터베이스 이름
     'user': 'root',  # 권한이 부여된 사용자 아이디
-    'password': 'ppap!@'  # 권한이 부여된 사용자 비밀번호
+    'password': '0000'  # 권한이 부여된 사용자 비밀번호
 }
 
 # 로깅 설정
@@ -505,6 +505,13 @@ def check_color_match(input_color, db_color):
     return False
 
 
+drug_query = """
+SELECT itemSeq, itemName, entpName, efcyQesitm, useMethodQesitm, atpnWarnQesitm, atpnQesitm, intrcQesitm, seQesitm, depositMethodQesitm, itemImage, etcotc
+FROM normal_drug 
+WHERE itemName LIKE %s
+"""
+
+# 알약 정보를 식별하고 검색하는 함수
 def identify_and_get_pill_info(pill_result):
     """
     알약 식별 및 정보 검색을 위한 통합 함수
@@ -526,7 +533,7 @@ def identify_and_get_pill_info(pill_result):
                pi.depositMethodQesitm, pi.itemImage,
                pid.PRINT_FRONT, pid.PRINT_BACK, pid.COLOR_CLASS1, pid.DRUG_SHAPE
         FROM pill_identification pid
-        JOIN pill_information pi ON pid.ITEM_SEQ = pi.itemSeq
+        JOIN normal_drug pi ON pid.ITEM_SEQ = pi.itemSeq
         WHERE (pid.PRINT_FRONT = %s OR pid.PRINT_BACK = %s)
         """
         exact_results = db_query(exact_query, (text, text))
@@ -558,7 +565,7 @@ def identify_and_get_pill_info(pill_result):
                    pi.depositMethodQesitm, pi.itemImage,
                    pid.PRINT_FRONT, pid.PRINT_BACK, pid.COLOR_CLASS1, pid.DRUG_SHAPE
             FROM pill_identification pid
-            JOIN pill_information pi ON pid.ITEM_SEQ = pi.itemSeq
+            JOIN normal_drug pi ON pid.ITEM_SEQ = pi.itemSeq
             WHERE (pid.PRINT_FRONT LIKE %s OR pid.PRINT_BACK LIKE %s)
             """
             prefix_results = db_query(prefix_query, (f"{text_prefix}%", f"{text_prefix}%"))
@@ -608,7 +615,7 @@ def identify_and_get_pill_info(pill_result):
                pi.depositMethodQesitm, pi.itemImage,
                pid.PRINT_FRONT, pid.PRINT_BACK, pid.COLOR_CLASS1, pid.DRUG_SHAPE
         FROM pill_identification pid
-        JOIN pill_information pi ON pid.ITEM_SEQ = pi.itemSeq
+        JOIN normal_drug pi ON pid.ITEM_SEQ = pi.itemSeq
         WHERE {" AND ".join(conditions)}
         LIMIT 5
         """
@@ -622,22 +629,21 @@ def identify_and_get_pill_info(pill_result):
     return None
 
 # 결과 처리 함수
-
 def process_results(results):
     processed_results = []
     for result in results:
         processed_result = {
-            'item_seq': result['itemSeq'],
-            'item_name': result['itemName'],
-            'company_name': result['entpName'],
-            'efficacy': result['efcyQesitm'],
+            'itemseq': result['itemSeq'],
+            'itemName': result['itemName'],
+            'entpName': result['entpName'],
+            'efcyQesitm': result['efcyQesitm'],
             'usage': result['useMethodQesitm'],
-            'precautions_warning': result['atpnWarnQesitm'],
-            'precautions': result['atpnQesitm'],
+            'atpnWarnQesitm': result['atpnWarnQesitm'],
+            'efcyQesitm': result['atpnQesitm'],
             'interactions': result['intrcQesitm'],
-            'side_effects': result['seQesitm'],
+            'seQesitm': result['seQesitm'],
             'storage': result['depositMethodQesitm'],
-            'image_url': result['itemImage'],
+            'itemImage': result['itemImage'],
             'print_front': result['PRINT_FRONT'],
             'print_back': result['PRINT_BACK'],
             'color': result['COLOR_CLASS1'],
@@ -646,6 +652,7 @@ def process_results(results):
         processed_results.append(processed_result)
     
     return processed_results
+
 
 # 법적 고지 저장 엔드포인트
 @api_v1.route('/legal-notice', methods=['POST'])
