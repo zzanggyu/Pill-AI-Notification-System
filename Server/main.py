@@ -41,7 +41,8 @@ DB_CONFIG = {
     'host': 'localhost',  # 호스트 설정
     'database': 'pill2',  # 데이터베이스 이름
     'user': 'root',  # 권한이 부여된 사용자 아이디
-    'password': 'ppap!@'  # 권한이 부여된 사용자 비밀번호
+    'password': '1234',  # 권한이 부여된 사용자 비밀번호
+    'port':3308
 }
 
 # 로깅 설정
@@ -703,7 +704,7 @@ def search():
 
     where_clause = " WHERE " + " OR ".join(query_conditions) if query_conditions else ""
     
-    query = f"SELECT * FROM normal_drug{where_clause}"
+    query = f"SELECT * FROM normal_drug{where_clause} LIMIT 20"
     drug_results = db_query(query, tuple(parameters))
 
     return create_response(True, "Search completed successfully", data=drug_results)
@@ -718,7 +719,7 @@ def search_by_name():
         return create_response(False, "Missing parameter", error="itemName parameter is required")
 
     drug_query = """
-    SELECT itemSeq, itemName, efcyQesitm, atpnQesitm, seQesitm, etcotc, itemImage 
+    SELECT itemSeq, itemName, entpName, efcyQesitm, useMethodQesitm, atpnWarnQesitm, atpnQesitm, intrcQesitm, seQesitm, depositMethodQesitm, itemImage, etcotc
     FROM normal_drug 
     WHERE itemName LIKE %s
     """
