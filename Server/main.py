@@ -41,8 +41,7 @@ DB_CONFIG = {
     'host': 'localhost',  # 호스트 설정
     'database': 'pill2',  # 데이터베이스 이름
     'user': 'root',  # 권한이 부여된 사용자 아이디
-    'password': '1234',  # 권한이 부여된 사용자 비밀번호
-    'port':3308
+    'password': 'ppap!@'  # 권한이 부여된 사용자 비밀번호
 }
 
 # 로깅 설정
