@@ -710,7 +710,7 @@ def search():
 
     where_clause = " WHERE " + " AND ".join(query_conditions) if query_conditions else ""
     
-    query = f"SELECT * FROM normal_drug{where_clause} LIMIT 20"
+    query = f"SELECT * FROM normal_drug{where_clause} LIMIT 40"
     drug_results = db_query(query, tuple(parameters))
 
     return create_response(True, "Search completed successfully", data=drug_results)
