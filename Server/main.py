@@ -708,7 +708,7 @@ def search():
         query_conditions.extend(["efcyQesitm LIKE %s"] * len(selected_symptoms))
         parameters.extend(["%" + s + "%" for s in selected_symptoms])
 
-    where_clause = " WHERE " + " OR ".join(query_conditions) if query_conditions else ""
+    where_clause = " WHERE " + " AND ".join(query_conditions) if query_conditions else ""
     
     query = f"SELECT * FROM normal_drug{where_clause} LIMIT 20"
     drug_results = db_query(query, tuple(parameters))
