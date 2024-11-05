@@ -2,7 +2,7 @@
 알약 정보 제공 서버 (Main Server)
 
 작성자: [김현규,정재호]
-마지막 수정: 2024-11-04
+마지막 수정: 2024-11-05 오인식 패턴 추가 신뢰도 점수 반환
 """
 ## identify_and_get_pill_info(pill_result) 연구하기 ### 10월 27일
 # 필요한 라이브러리 및 모듈 임포트
@@ -478,6 +478,49 @@ def calculate_text_similarity(text1, text2):
         substring_ratio * 0.6   # 부분 문자열 일치
     )
 
+def calculate_ocr_similarity(text1, text2):
+    """
+    OCR 오인식을 고려한 텍스트 유사도 계산
+    - 자주 발생하는 OCR 오인식 패턴을 고려
+    - 대소문자 구분 없이 비교
+    """
+    if not text1 or not text2:
+        return 0
+    
+    # 기본 문자 유사도
+    basic_sim = fuzz.ratio(text1, text2)
+    
+    # OCR 오인식이 흔한 문자 쌍들
+    ocr_pairs = [
+        ('F', 'T'), ('O', 'D'), ('I', '1'), ('I', 'L'),
+        ('B', '8'), ('S', '5'), ('Z', '2'), ('G', '6'),
+        ('O', '0'), ('U', 'V'), ('C', 'G'), ('Q', 'O'),
+        ('M', 'N'), ('W', 'VV'), ('rn', 'm'), ('cl', 'd'),
+        ('nn', 'm'), ('ii', 'n'), ('H', 'l-l'),
+        ('E', 'F'), ('B', 'R'), ('P', 'R')
+    ]
+    
+    # 각 문자 쌍에 대해 치환해보고 가장 높은 유사도 선택
+    max_sim = basic_sim
+    for old_char, new_char in ocr_pairs:
+        # 양방향 치환 검사
+        replaced_text1 = text1.replace(old_char, new_char)
+        replaced_text2 = text2.replace(old_char, new_char)
+        reverse_text1 = text1.replace(new_char, old_char)
+        reverse_text2 = text2.replace(new_char, old_char)
+        
+        # 모든 치환 케이스의 유사도 계산
+        sims = [
+            fuzz.ratio(replaced_text1, text2),
+            fuzz.ratio(text1, replaced_text2),
+            fuzz.ratio(reverse_text1, text2),
+            fuzz.ratio(text1, reverse_text2)
+        ]
+        
+        max_sim = max(max_sim, *sims)
+    
+    return max_sim
+
 def check_color_match(input_color, db_color):
     """
     색상 그룹 매칭을 확인하는 함수
@@ -515,17 +558,17 @@ WHERE itemName LIKE %s
 def identify_and_get_pill_info(pill_result):
     """
     알약 식별 및 정보 검색을 위한 통합 함수
+    - 60점 이상의 결과만 반환
+    - 신뢰도 점수 포함
     """
-    logger.info("Starting integrated pill identification and info retrieval")
-    
-    text = ' '.join(pill_result.get('text', [])).strip()
+    text = ' '.join(pill_result.get('text', [])).strip().upper()
     color = pill_result.get('color', {}).get('specific', '').strip()
     shape_info = pill_result.get('shape', {})
     shape = shape_info.get('predicted_class', '').strip() if isinstance(shape_info, dict) else ''
     
     logger.info(f"Extracted text: {text}, color: {color}, shape: {shape}")
 
-    # 1단계: 텍스트 정확 일치 + (색상 AND/OR 모양)
+    # 1단계: 정확한 텍스트 매칭
     if text:
         exact_query = """
         SELECT pi.itemSeq, pi.itemName, pi.entpName, pi.efcyQesitm, pi.useMethodQesitm, 
@@ -534,125 +577,133 @@ def identify_and_get_pill_info(pill_result):
                pid.PRINT_FRONT, pid.PRINT_BACK, pid.COLOR_CLASS1, pid.DRUG_SHAPE
         FROM pill_identification pid
         JOIN normal_drug pi ON pid.ITEM_SEQ = pi.itemSeq
-        WHERE (pid.PRINT_FRONT = %s OR pid.PRINT_BACK = %s)
+        WHERE UPPER(pid.PRINT_FRONT) = %s OR UPPER(pid.PRINT_BACK) = %s
         """
         exact_results = db_query(exact_query, (text, text))
         
         if exact_results:
             logger.info(f"Found exact matches: {len(exact_results)} pills")
-            # 정확한 텍스트 매치가 있으면, 색상과 모양 일치도로 정렬
             scored_results = []
             for result in exact_results:
-                score = 100  # 기본 점수 (텍스트 정확 매치)
-                if result['COLOR_CLASS1'] == color:
-                    score += 20  # 색상 일치 보너스
-                if result['DRUG_SHAPE'] == shape:
-                    score += 10  # 모양 일치 보너스
-                scored_results.append((score, result))
+                text_score = 60
+                color_score = 25 if result['COLOR_CLASS1'] == color else 0
+                shape_score = 15 if result['DRUG_SHAPE'] == shape else 0
+                total_score = text_score + color_score + shape_score
+                if total_score >= 60:
+                    scored_results.append((total_score, result))
             
-            scored_results.sort(reverse=True, key=lambda x: x[0])
-            return process_results([result for _, result in scored_results])
+            if scored_results:
+                scored_results.sort(reverse=True, key=lambda x: x[0])
+                return process_results([result for _, result in scored_results], include_scores=[score for score, _ in scored_results])
 
-    # 2단계: 텍스트 앞부분 일치 검색 + 색상/모양 가중치
+    # 2단계: 텍스트 일부 일치 검색
     if text:
-        # 텍스트의 앞부분으로 검색 (예: TYLENOL -> TYLEN%)
-        min_length = min(len(text), 4)  # 최소 4글자까지만 사용
-        if min_length >= 2:  # 최소 2글자 이상일 때만 검색
-            text_prefix = text[:min_length]
-            prefix_query = """
-            SELECT pi.itemSeq, pi.itemName, pi.entpName, pi.efcyQesitm, pi.useMethodQesitm, 
-                   pi.atpnWarnQesitm, pi.atpnQesitm, pi.intrcQesitm, pi.seQesitm, 
-                   pi.depositMethodQesitm, pi.itemImage,
-                   pid.PRINT_FRONT, pid.PRINT_BACK, pid.COLOR_CLASS1, pid.DRUG_SHAPE
-            FROM pill_identification pid
-            JOIN normal_drug pi ON pid.ITEM_SEQ = pi.itemSeq
-            WHERE (pid.PRINT_FRONT LIKE %s OR pid.PRINT_BACK LIKE %s)
-            """
-            prefix_results = db_query(prefix_query, (f"{text_prefix}%", f"{text_prefix}%"))
-            
-            if prefix_results:
-                logger.info(f"Found prefix matches: {len(prefix_results)} pills")
-                scored_results = []
-                for result in prefix_results:
-                    # 텍스트 유사도 점수 (0-60점)
-                    front_text = result.get('PRINT_FRONT', '') or ''
-                    back_text = result.get('PRINT_BACK', '') or ''
-                    text_sim = max(fuzz.ratio(text, front_text), fuzz.ratio(text, back_text))
-                    text_score = text_sim * 0.6
-                    
-                    # 색상 점수 (25점)
-                    color_score = 25 if result['COLOR_CLASS1'] == color else 0
-                    
-                    # 모양 점수 (15점)
-                    shape_score = 15 if result['DRUG_SHAPE'] == shape else 0
-                    
-                    total_score = text_score + color_score + shape_score
-                    
-                    if total_score >= 50:  # 최소 점수 상향 조정
-                        scored_results.append((total_score, result))
-                        logger.info(f"Scores for {result['itemName']}: text={text_score:.1f}, "
-                                  f"color={color_score}, shape={shape_score}, total={total_score:.1f}")
-                
-                if scored_results:
-                    scored_results.sort(reverse=True, key=lambda x: x[0])
-                    return process_results([result for _, result in scored_results[:5]])
-
-    # 3단계: 색상과 모양으로만 검색 (텍스트가 없는 경우)
-    if (not text) and (color or shape):
-        conditions = []
-        params = []
-        
-        if color:
-            conditions.append("pid.COLOR_CLASS1 = %s")
-            params.append(color)
-        if shape:
-            conditions.append("pid.DRUG_SHAPE = %s")
-            params.append(shape)
-            
-        query = f"""
+        partial_query = """
         SELECT pi.itemSeq, pi.itemName, pi.entpName, pi.efcyQesitm, pi.useMethodQesitm, 
                pi.atpnWarnQesitm, pi.atpnQesitm, pi.intrcQesitm, pi.seQesitm, 
                pi.depositMethodQesitm, pi.itemImage,
                pid.PRINT_FRONT, pid.PRINT_BACK, pid.COLOR_CLASS1, pid.DRUG_SHAPE
         FROM pill_identification pid
         JOIN normal_drug pi ON pid.ITEM_SEQ = pi.itemSeq
-        WHERE {" AND ".join(conditions)}
-        LIMIT 5
+        WHERE UPPER(pid.PRINT_FRONT) LIKE %s OR UPPER(pid.PRINT_BACK) LIKE %s
         """
+        partial_results = db_query(partial_query, (f"%{text}%", f"%{text}%"))
         
-        results = db_query(query, tuple(params))
-        if results:
-            logger.info(f"Found shape/color matches: {len(results)} pills")
-            return process_results(results)
+        if partial_results:
+            logger.info(f"Found partial matches: {len(partial_results)} pills")
+            scored_results = []
+            for result in partial_results:
+                front_text = (result.get('PRINT_FRONT', '') or '').upper()
+                back_text = (result.get('PRINT_BACK', '') or '').upper()
+                
+                text_sim = max(
+                    fuzz.ratio(text, front_text),
+                    fuzz.ratio(text, back_text)
+                ) / 100.0
+                
+                text_score = text_sim * 60
+                color_score = 25 if result['COLOR_CLASS1'] == color else 0
+                shape_score = 15 if result['DRUG_SHAPE'] == shape else 0
+                total_score = text_score + color_score + shape_score
+                
+                if total_score >= 60:
+                    scored_results.append((total_score, result))
+                    logger.info(f"Scores for {result['itemName']}: text={text_score:.1f}, "
+                              f"color={color_score}, shape={shape_score}, total={total_score:.1f}")
+            
+            if scored_results:
+                scored_results.sort(reverse=True, key=lambda x: x[0])
+                return process_results([result for _, result in scored_results[:5]], include_scores=[score for score, _ in scored_results[:5]])
+
+    # 3단계: OCR 오인식을 고려한 유사도 검색
+    fuzzy_query = """
+    SELECT pi.itemSeq, pi.itemName, pi.entpName, pi.efcyQesitm, pi.useMethodQesitm, 
+           pi.atpnWarnQesitm, pi.atpnQesitm, pi.intrcQesitm, pi.seQesitm, 
+           pi.depositMethodQesitm, pi.itemImage,
+           pid.PRINT_FRONT, pid.PRINT_BACK, pid.COLOR_CLASS1, pid.DRUG_SHAPE
+    FROM pill_identification pid
+    JOIN normal_drug pi ON pid.ITEM_SEQ = pi.itemSeq
+    """
+    all_results = db_query(fuzzy_query)
+    
+    scored_results = []
+    for result in all_results:
+        front_text = (result.get('PRINT_FRONT', '') or '').upper()
+        back_text = (result.get('PRINT_BACK', '') or '').upper()
+        
+        text_sim = max(
+            calculate_ocr_similarity(text, front_text),
+            calculate_ocr_similarity(text, back_text)
+        ) / 100.0
+        
+        text_score = text_sim * 60
+        color_score = 25 if result['COLOR_CLASS1'] == color else 0
+        shape_score = 15 if result['DRUG_SHAPE'] == shape else 0
+        total_score = text_score + color_score + shape_score
+        
+        if total_score >= 60:
+            scored_results.append((total_score, result))
+            logger.info(f"Scores for {result['itemName']}: text={text_score:.1f}, "
+                      f"color={color_score}, shape={shape_score}, total={total_score:.1f}")
+    
+    if scored_results:
+        scored_results.sort(reverse=True, key=lambda x: x[0])
+        return process_results([result for _, result in scored_results[:5]], include_scores=[score for score, _ in scored_results[:5]])
     
     logger.warning("No matching pills found")
     return None
 
 # 결과 처리 함수
-def process_results(results):
+def process_results(results, include_scores=None):
+    """
+    결과 처리 함수 - 신뢰도 점수만 포함
+    """
     processed_results = []
-    for result in results:
+    for idx, result in enumerate(results):
         processed_result = {
-            'itemseq': result['itemSeq'],
+            'itemSeq': result['itemSeq'],
             'itemName': result['itemName'],
             'entpName': result['entpName'],
             'efcyQesitm': result['efcyQesitm'],
-            'usage': result['useMethodQesitm'],
+            'useMethodQesitm': result['useMethodQesitm'],
             'atpnWarnQesitm': result['atpnWarnQesitm'],
-            'efcyQesitm': result['atpnQesitm'],
-            'interactions': result['intrcQesitm'],
+            'atpnQesitm': result['atpnQesitm'],
+            'intrcQesitm': result['intrcQesitm'],
             'seQesitm': result['seQesitm'],
-            'storage': result['depositMethodQesitm'],
+            'depositMethodQesitm': result['depositMethodQesitm'],
             'itemImage': result['itemImage'],
-            'print_front': result['PRINT_FRONT'],
-            'print_back': result['PRINT_BACK'],
+            'printFront': result['PRINT_FRONT'],
+            'printBack': result['PRINT_BACK'],
             'color': result['COLOR_CLASS1'],
             'shape': result['DRUG_SHAPE']
         }
+        # 신뢰도 점수 추가
+        if include_scores:
+            processed_result['confidence'] = round(include_scores[idx], 2)
+            
         processed_results.append(processed_result)
     
     return processed_results
-
 
 # 법적 고지 저장 엔드포인트
 @api_v1.route('/legal-notice', methods=['POST'])
