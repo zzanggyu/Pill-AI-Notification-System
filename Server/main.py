@@ -573,7 +573,7 @@ def identify_and_get_pill_info(pill_result):
         exact_query = """
         SELECT pi.itemSeq, pi.itemName, pi.entpName, pi.efcyQesitm, pi.useMethodQesitm, 
                pi.atpnWarnQesitm, pi.atpnQesitm, pi.intrcQesitm, pi.seQesitm, 
-               pi.depositMethodQesitm, pi.itemImage,
+               pi.depositMethodQesitm, pi.itemImage, pi.etcotc,
                pid.PRINT_FRONT, pid.PRINT_BACK, pid.COLOR_CLASS1, pid.DRUG_SHAPE
         FROM pill_identification pid
         JOIN normal_drug pi ON pid.ITEM_SEQ = pi.itemSeq
@@ -601,7 +601,7 @@ def identify_and_get_pill_info(pill_result):
         partial_query = """
         SELECT pi.itemSeq, pi.itemName, pi.entpName, pi.efcyQesitm, pi.useMethodQesitm, 
                pi.atpnWarnQesitm, pi.atpnQesitm, pi.intrcQesitm, pi.seQesitm, 
-               pi.depositMethodQesitm, pi.itemImage,
+               pi.depositMethodQesitm, pi.itemImage,pi.etcotc,
                pid.PRINT_FRONT, pid.PRINT_BACK, pid.COLOR_CLASS1, pid.DRUG_SHAPE
         FROM pill_identification pid
         JOIN normal_drug pi ON pid.ITEM_SEQ = pi.itemSeq
@@ -639,7 +639,7 @@ def identify_and_get_pill_info(pill_result):
     fuzzy_query = """
     SELECT pi.itemSeq, pi.itemName, pi.entpName, pi.efcyQesitm, pi.useMethodQesitm, 
            pi.atpnWarnQesitm, pi.atpnQesitm, pi.intrcQesitm, pi.seQesitm, 
-           pi.depositMethodQesitm, pi.itemImage,
+           pi.depositMethodQesitm, pi.itemImage,pi.etcotc,
            pid.PRINT_FRONT, pid.PRINT_BACK, pid.COLOR_CLASS1, pid.DRUG_SHAPE
     FROM pill_identification pid
     JOIN normal_drug pi ON pid.ITEM_SEQ = pi.itemSeq
@@ -692,6 +692,7 @@ def process_results(results, include_scores=None):
             'seQesitm': result['seQesitm'],
             'depositMethodQesitm': result['depositMethodQesitm'],
             'itemImage': result['itemImage'],
+            'etcotc': result.get('etcotc', ''),
             'printFront': result['PRINT_FRONT'],
             'printBack': result['PRINT_BACK'],
             'color': result['COLOR_CLASS1'],
