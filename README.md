@@ -83,7 +83,7 @@
 - UI/UX 디자인: Figma
 
 ### Backend
-- Flask 메인 서버
+- Flask 메인 서버, 모델 서버
 - MariaDB 데이터베이스
 - API 통합 및 관리
 
