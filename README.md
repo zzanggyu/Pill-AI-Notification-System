@@ -24,7 +24,7 @@
 ## 👥 팀 구성 및 역할
 
 ### UI/UX 디자인
-- 팀장 허창연
+- 허창연
   - UI/UX 디자인 
   - Figma UI 디자인
   - VGG 모델 학습
@@ -124,4 +124,10 @@ graph TD
 - [식품의약품안전처_의약품개요정보(e약은요)](https://www.data.go.kr/data/15075057/openapi.do)
 
 ## 📞 문의사항
-김현규 khgg010@naver.com
+- 김현규 : khgg010@naver.com
+- 허창연 : gjckddus@gmail.com
+- 김세찬 : sechanstark@naver.com
+- 정재호 : wogh916@naver.com
+- 이태석 : ttym789@naver.com
+
+
