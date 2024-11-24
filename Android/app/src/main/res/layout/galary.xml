@@ -1,0 +1,108 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FAFAFA"
+        android:padding="16dp">
+
+        <ImageButton
+            android:id="@+id/back_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="?attr/selectableItemBackground"
+            android:src="@drawable/ic_back"
+            android:contentDescription="back_button"/>
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="갤러리에서 검색"
+            android:textColor="#000000"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <!-- 사진 그리드 (여기에 갤러리 연동)-->
+    <GridView
+        android:id="@+id/photo_grid"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="4dp"
+        android:numColumns="3" />
+
+    <!-- 사진 선택 버튼 (사진 선택 전) -->
+    <ImageButton
+        android:id="@+id/select_button_inactive"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:src="@drawable/select_button_inactive"
+        android:padding="16dp"
+        android:layout_marginTop="8dp"
+        android:contentDescription="select_button_inactive"/>
+
+    <!-- 사진 선택 버튼 (사진 선택 후)-->
+    <ImageButton
+        android:id="@+id/select_button_active"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:src="@drawable/select_button_active"
+        android:padding="16dp"
+        android:layout_marginTop="8dp"
+        android:visibility="gone" /> <!-- 기본적으로 숨김 -->
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom">
+
+        <ImageView
+            android:id="@+id/navigation_bar"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/navigation_bar_image" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/alarm_button"
+                android:layout_width="0dp"
+                android:layout_height="90dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:contentDescription="alarm_button"/>
+
+            <Button
+                android:id="@+id/home_button"
+                android:layout_width="0dp"
+                android:layout_height="90dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:contentDescription="home_button"/>
+
+            <Button
+                android:id="@+id/profile_button"
+                android:layout_width="0dp"
+                android:layout_height="90dp"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:contentDescription="profile_button"/>
+        </LinearLayout>
+    </RelativeLayout>
+
+</LinearLayout>
